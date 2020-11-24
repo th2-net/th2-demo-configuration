@@ -1,0 +1,36 @@
+apiVersion: th2.exactpro.com/v1
+kind: Th2Link
+metadata:
+  name: from-act-links
+spec:
+  boxes-relation:
+    router-mq:
+#########################SIM#################################################
+      - name: act-demo1-conn
+        from:
+          box: act
+          pin: to_send_demo-conn1
+        to:
+          box: demo-conn1
+          pin: fix_to_send
+      - name: act-demo2-conn
+        from:
+          box: act
+          pin: to_send_demo-conn2
+        to:
+          box: demo-conn2
+          pin: fix_to_send
+##############################################################################
+    router-grpc:
+      - name: act-to-check1
+        from:
+          service-class: com.exactpro.th2.check1.Check1Handler
+          strategy: filter
+          box: act
+          pin: to_check1
+        to:
+          service-class: com.exactpro.th2.check1.grpc.Check1Service
+          strategy: robin
+          box: check1
+          pin: server
+

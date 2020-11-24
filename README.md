@@ -1,2 +1,1 @@
-# th2-schema-demo-configuration
-Configuration for demo schema environment.
+![alt text](schema.png)

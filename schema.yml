@@ -1,0 +1,14 @@
+kind: SettingsFile
+metadata:
+  name: schema
+spec:
+  k8s-propagation: rule
+#
+#  values for k8s-propagation property:
+#
+#    off  - No synchronization will be done
+#    deny - No synchronization will be done and associated namespece will be removed from kubernetes
+#    sync - Synchronizes repository changes with kubernetes
+#    rule - Synchronizes repository changes with kubernetes and watches resource changes in kubernetes and 
+#           brings them back to repository state
+#  
