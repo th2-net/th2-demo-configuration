@@ -1,1 +1,1 @@
-![alt text](schema.png)
+![alt text](infra.png)
