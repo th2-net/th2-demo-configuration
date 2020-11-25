@@ -1,1 +1,0 @@
-![alt text](schema.png)

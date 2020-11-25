@@ -1,6 +1,6 @@
 kind: SettingsFile
 metadata:
-  name: schema
+  name: infra
 spec:
   k8s-propagation: rule
 #
