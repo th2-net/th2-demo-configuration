@@ -1,0 +1,13 @@
+---
+- 'SecurityID': 'INSTR1'
+  'Price': 55
+- 'SecurityID': 'INSTR2'
+  'Price': 35
+- 'SecurityID': 'INSTR3'
+  'Price': 75
+- 'SecurityID': 'INSTR4'
+  'Price': 45
+- 'SecurityID': 'INSTR5'
+  'Price': 65
+- 'SecurityID': 'INSTR6'
+  'Price': 65

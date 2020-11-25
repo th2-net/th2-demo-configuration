@@ -1,0 +1,11 @@
+---
+- FirmName: DEMOFIRM1
+  Traders:
+  - TraderName: DEMO-CONN1
+    TraderConnection: demo-conn1
+  Dropcopy: demo-dc1
+- FirmName: DEMOFIRM2
+  Traders:
+  - TraderName: DEMO-CONN2
+    TraderConnection: demo-conn2
+  Dropcopy: demo-dc2

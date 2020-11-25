@@ -1,0 +1,14 @@
+{
+  "queues": {
+    "event-store-pin": {
+      "attributes": [
+        "event",
+        "publish"
+      ],
+      "exchange": "fill with rabbit exchange name",
+      "filters": [],
+      "name": "fill with routing key of script to estore",
+      "queue": "not_necessary"
+    }
+  }
+}
