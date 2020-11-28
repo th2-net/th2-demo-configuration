@@ -10,7 +10,7 @@ from th2_grpc_act_template.act_template_pb2 import *
 from th2_grpc_check1.check1_pb2 import *
 from th2_grpc_common.common_pb2 import *
 
-from .custom import support_functions as sf
+from custom import support_functions as sf
 
 # IMPORT REFDATA FROM FILES
 with open('configs/instruments.refdata') as f:
