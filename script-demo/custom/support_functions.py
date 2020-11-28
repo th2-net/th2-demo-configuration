@@ -5,6 +5,7 @@ import logging
 import random
 import uuid
 import time
+from th2_grpc_act_template.act_template_pb2 import PlaceMessageRequest
 from google.protobuf.timestamp_pb2 import Timestamp
 from th2_common.schema.factory.common_factory import CommonFactory
 from th2_grpc_act_template.act_template_service import ActService
@@ -347,3 +348,22 @@ def wrap_into_no_related_sym(value_type, repeating_groups):
     else:
         print("Incorrect value type for NoRelatedSym. Only filter or value available")
         raise SystemExit
+
+
+def request_security_status(instrument, session_alias, event_id, factory):
+    # SecurityStatusRequest parametes
+    sec_status_request = {
+        'SecurityID': instrument,
+        'SecurityIDSource': '8',
+        'SecurityStatusReqID': instrument
+    }
+    # Sending message to act
+    sendMessage(
+        act=factory['act'],
+        place_message_request=PlaceMessageRequest(
+            description=f'Request SecurityStatus for {instrument}',
+            connection_id=ConnectionID(session_alias=session_alias),
+            parent_event_id=event_id,
+            message=create_message_object(msg_type='SecurityStatusRequest',
+                                             fields=sec_status_request,
+                                             session_alias=session_alias)))

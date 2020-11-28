@@ -21,7 +21,39 @@ with open('configs/firms.refdata') as f:
 
 def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_name, report_id, input_parameters,
                                                                           factory):
-    # ################CREATION OF REPORT FOR CASE######################
+    # ####SETTING STATIC INFORMATION###################################################################################
+    # General parameters for orders in this case
+    new_order_general_parameters = {
+        'SecurityID': input_parameters['Instrument'],
+        'SecurityIDSource': "8",
+        'OrdType': "2",
+        'AccountType': "1",
+        'OrderCapacity': "A",
+    }
+    # NoPartyIDs repeating group for Trader1
+    trader1_trading_party = [
+        {'PartyID': input_parameters['trader1'], 'PartyIDSource': "D", 'PartyRole': "76"},
+        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
+        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
+        {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
+    # NoPartyIDs repeating group for Trader2
+    trader2_trading_party = [
+        {'PartyID': input_parameters["trader2"], 'PartyIDSource': "D", 'PartyRole': "76"},
+        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
+        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
+        {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
+    # FIX header
+    basic_header = {
+        'BeginString': 'FIXT.1.1',
+        'SenderCompID': 'FGW',
+        'SendingTime': '*',
+        'MsgSeqNum': '*',
+        'BodyLength': '*',
+        'MsgType': '8', }
+
+    ###################################################################################################################
+
+    # ################CREATING THE REPORT FOR CASE#####################################################################
     case_start_timestamp = Timestamp()
     case_start_timestamp.GetCurrentTime()
 
@@ -33,24 +65,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
             start_timestamp=case_start_timestamp,
             event_id=input_parameters['case_id'],
             parent_id=report_id))
-    ##################################################################
+    ###################################################################################################################
 
-    # ######SENDING ORDER1############################################
-    # General parameters for several orders
-    new_order_general_parameters = {
-        'SecurityID': input_parameters['Instrument'],
-        'SecurityIDSource': "8",
-        'OrdType': "2",
-        'AccountType': "1",
-        'OrderCapacity': "A",
-    }
-
-    # NoPartyIDs repeating group for Trader1
-    trader1_trading_party = [
-        {'PartyID': input_parameters['trader1'], 'PartyIDSource': "D", 'PartyRole': "76"},
-        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
-        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
-        {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
+    # ######STEP1 - TRADER1 SENDS PASSIVE BUY ORDER WITH PRICE = X ####################################################
 
     # Unique parameters for Order1
     order1_parameters = {
@@ -68,7 +85,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     order1_response = sf.placeOrderFIX(
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
-            description=f'Trader "{input_parameters["trader1"]}" sends request to create Order.',
+            description=f'STEP1: Trader "{input_parameters["trader1"]}" sends request to create passive Order.',
             connection_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             parent_event_id=input_parameters['case_id'],
             message=sf.create_message_object(msg_type='NewOrderSingle',
@@ -77,18 +94,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     # Check if response is correct
     if order1_response.status.status != 0:
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
-    ##################################################################
+    ###################################################################################################################
 
-    # ######REQUEST TO VERIFY EXECUTION REPORT ON ORDER1##############
-    # FIX header
-    basic_header = {
-        'BeginString': 'FIXT.1.1',
-        'SenderCompID': 'FGW',
-        'SendingTime': '*',
-        'MsgSeqNum': '*',
-        'BodyLength': '*',
-        'MsgType': '8', }
-
+    # ######STEP2 - TRADER1 RECEIVES THE EXECUTION REPORT WITH EXECTYPE = NEW #########################################
     # Unique parameters for Execution Report ExecType=NEW on Order1
     er1_parameters = {
         **new_order_general_parameters,
@@ -112,7 +120,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     ver1_chain = sf.submitCheckSequenceRule(
         check=factory['check'],
         check_sequence_rule_request=CheckSequenceRuleRequest(
-            description=f'Trader "{input_parameters["trader1"]}" receives Execution Report. '
+            description=f'STEP2: Trader "{input_parameters["trader1"]}" receives Execution Report. '
             f'The order stands on book in status NEW',
             chain_id=sf.create_chain_id() if not input_parameters['ver1_chain'] else input_parameters['ver1_chain'],
             connectivity_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
@@ -127,9 +135,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
                                                      fields=er1_parameters,
                                                      key_fields_list=['ClOrdID'])]
         ))
-    ##################################################################
+    ###################################################################################################################
 
-    # ####SENDING ORDER2##############################################
+    # ####STEP3 - TRADER1 SENDS PASSIVE BUY ORDER WITH PRICE = X-1 ####################################################
     # Unique parameters for Order2
     order2_parameters = {
         **new_order_general_parameters,
@@ -146,8 +154,8 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     order2_response = sf.placeOrderFIX(
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
-            description=f'Trader "{input_parameters["trader1"]}" '
-            f'sends request to create Order with price lower than first order.',
+            description=f'STEP3: Trader "{input_parameters["trader1"]}" '
+            f'sends request to create passive Order with price lower than first order.',
             connection_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             parent_event_id=input_parameters['case_id'],
             message=sf.create_message_object(msg_type='NewOrderSingle',
@@ -157,10 +165,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     # Check if response is correct
     if order2_response.status.status != 0:
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
-    ##################################################################
+    ###################################################################################################################
 
-    # ######REQUEST TO VERIFY EXECUTION REPORT ON ORDER2##############
-
+    # ######STEP4 - TRADER1 RECEIVES THE EXECUTION REPORT WITH EXECTYPE = NEW #########################################
     # Unique parameters for Execution Report ExecType=NEW for Order2
     er2_parameters = {
         **new_order_general_parameters,
@@ -184,7 +191,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     sf.submitCheckSequenceRule(
         check=factory['check'],
         check_sequence_rule_request=CheckSequenceRuleRequest(
-            description=f'Trader "{input_parameters["trader1"]}" '
+            description=f'STEP4: Trader "{input_parameters["trader1"]}" '
             f'receives Execution Report. The order stands on book in status NEW',
             connectivity_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             checkpoint=order2_response.checkpoint_id,
@@ -196,16 +203,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
                                                      fields=er2_parameters,
                                                      key_fields_list=['ClOrdID'])]
         ))
-    ##################################################################
+    ###################################################################################################################
 
-    # ####SENDING ORDER3##############################################
-    # NoPartyIDs repeating group for Trader2
-    trader2_trading_party = [
-        {'PartyID': input_parameters["trader2"], 'PartyIDSource': "D", 'PartyRole': "76"},
-        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
-        {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
-        {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
-
+    # ####STEP5 - TRADER2 SENDS AGGRESSIVE SELL ORDER WITH PRICE = X+1 ################################################
     # Unique parameters for Order3
     order3_parameters = {
         **new_order_general_parameters,
@@ -219,11 +219,11 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
         'TradingParty': sf.wrap_into_trading_party("value", trader2_trading_party),
     }
 
-    # Sending message to ACT and waiting for response
+    # Sending message to act and waiting for response
     order3_response = sf.placeOrderFIX(
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
-            description=f'Trader "{input_parameters["trader2"]}" sends request to create IOC Order.',
+            description=f'STEP5: Trader "{input_parameters["trader2"]}" sends request to create aggressive IOC Order.',
             connection_id=ConnectionID(session_alias=input_parameters['trader2_fix']),
             parent_event_id=input_parameters['case_id'],
             message=sf.create_message_object(msg_type='NewOrderSingle',
@@ -233,9 +233,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     # Check if response is correct
     if order3_response.status.status != 0:
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
-    ##################################################################
+    ###################################################################################################################
 
-    # ######REQUEST TO VERIFY EXECUTION REPORTS ON TRADE##############
+    # ######STEP6 - TRADER1 RECEIVES TWO EXECUTION REPORTS WITH EXECTYPE = TRADE ######################################
     # Parameters for Execution Report ExecType=TRADE Order2vsOrder3
     er_2vs3_parameters = {
         **new_order_general_parameters,
@@ -292,8 +292,8 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     sf.submitCheckSequenceRule(
         check=factory['check'],
         check_sequence_rule_request=CheckSequenceRuleRequest(
-            description=f'Trader "{input_parameters["trader1"]}" receives Execution Reports: '
-            f'first at Order2 and second on Order1 .',
+            description=f'STEP6: Trader "{input_parameters["trader1"]}" receives Execution Reports with ExecType=F: '
+            f'first at Order2 and second on Order1.',
             connectivity_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             chain_id=ver1_chain.chain_id,
             timeout=1000,
@@ -301,7 +301,9 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
             pre_filter=PreFilter(fields={'SecurityID': ValueFilter(simple_filter=input_parameters['Instrument'])}),
             message_filters=[er_2vs3_filter, er_1vs3_filter],
             check_order=True))
+    ###################################################################################################################
 
+    # ######STEP7 - TRADER2 RECEIVES TWO EXECUTION REPORTS WITH EXECTYPE = TRADE AND ONE WITH EXECTYPE = EXPIRED#######
     # Parameters for Execution Report ExecType=TRADE Order3vsOrder2
     er_3vs2_parameters = {
         **new_order_general_parameters,
@@ -379,7 +381,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     ver2_chain = sf.submitCheckSequenceRule(
         check=factory['check'],
         check_sequence_rule_request=CheckSequenceRuleRequest(
-            description=f'Trader "{input_parameters["trader2"]}" receives Execution Reports: '
+            description=f'STEP7: Trader "{input_parameters["trader2"]}" receives Execution Reports: '
             f'first trade with Order2, next with Order1 and then cancellation',
             connectivity_id=ConnectionID(session_alias=input_parameters['trader2_fix']),
             checkpoint=order3_response.checkpoint_id,
@@ -389,30 +391,11 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
             pre_filter=PreFilter(fields={'SecurityID': ValueFilter(simple_filter=input_parameters['Instrument'])}),
             message_filters=[er_3vs2_filter, er_3vs1_filter, er_cancellation_filter],
             check_order=True))
-    ##################################################################
-    # Case execution time
+    ###################################################################################################################
+    # Print case execution time
     print("Case " + case_name + " is executed in " + str(
         round(datetime.now().timestamp() - case_start_timestamp.ToSeconds())) + " sec.")
     return ver1_chain.chain_id, ver2_chain.chain_id
-
-
-def request_security_status(instrument, session_alias, event_id, factory):
-    # SecurityStatusRequest parametes
-    sec_status_request = {
-        'SecurityID': instrument,
-        'SecurityIDSource': '8',
-        'SecurityStatusReqID': instrument
-    }
-    # Sending message to act
-    sf.sendMessage(
-        act=factory['act'],
-        place_message_request=PlaceMessageRequest(
-            description=f'Request SecurityStatus for {instrument}',
-            connection_id=ConnectionID(session_alias=session_alias),
-            parent_event_id=event_id,
-            message=sf.create_message_object(msg_type='SecurityStatusRequest',
-                                             fields=sec_status_request,
-                                             session_alias=session_alias)))
 
 
 def scenario():
@@ -431,12 +414,12 @@ def scenario():
     # Initialize chain_id for script
     ver1_chain = None
     ver2_chain = None
-
+    scenario_id = 1
     # Sending request to estore. Creation of the root Event for all cases performed.
     sf.submit_event(
         estore=factory['estore'],
         event_batch=sf.create_event_batch(
-            report_name="Aggressive IOC vs two orders: second order's price is lower than first",
+            report_name=f"[TS_{scenario_id}]Aggressive IOC vs two orders: second order's price is lower than first",
             start_timestamp=report_start_timestamp,
             event_id=report_id))
 
@@ -448,26 +431,28 @@ def scenario():
     trader2_firm = firms[1]['FirmName']
     trader2_fix = firms[1]['Traders'][0]['TraderConnection']
 
-    # ####Request security statuses##################################
+    # ####REQUEST SECURITY STATUSES##################################
     mdata_requests_report = sf.create_event_id()
-
     # Sending request to estore. Creation of the root Event for all cases performed later.
     sf.submit_event(
         estore=factory['estore'],
         event_batch=sf.create_event_batch(
-            report_name="Request security statuses",
+            report_name="Prerequisites: Request security statuses",
             start_timestamp=report_start_timestamp,
             event_id=mdata_requests_report,
             parent_id=report_id))
 
     for instrument in instruments:
-        request_security_status(instrument['SecurityID'], trader1_fix, mdata_requests_report, factory)
+        sf.request_security_status(instrument['SecurityID'], trader1_fix, mdata_requests_report, factory)
     ##################################################################
 
+    case_id = 0
     # Execution of case for every instrument in refdata
     for instrument in instruments:
+        case_id += 1
         ver1_chain, ver2_chain = aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(
-            f"Case: Trader {trader1} vs trader {trader2} for instrument {instrument['SecurityID']}",
+            f"Case[TC_{scenario_id}.{case_id}]: "
+            f"Trader {trader1} vs trader {trader2} for instrument {instrument['SecurityID']}",
             report_id, {
                 'case_id': sf.create_event_id(),
                 'Instrument': instrument['SecurityID'],
@@ -490,5 +475,5 @@ def scenario():
 
 if __name__ == '__main__':
     logging.basicConfig(filename=time.asctime().replace(':', '-') + ' script.log',
-                        level=logging.DEBUG, format='%(asctime)s %(message)s')
+                        level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     scenario()
