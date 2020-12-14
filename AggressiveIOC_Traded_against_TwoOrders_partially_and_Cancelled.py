@@ -45,7 +45,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     # FIX header
     basic_header = {
         'BeginString': 'FIXT.1.1',
-        'SenderCompID': 'FGW',
+        'SenderCompID': '*',
         'SendingTime': '*',
         'MsgSeqNum': '*',
         'BodyLength': '*',
@@ -92,7 +92,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
                                              fields=order1_parameters,
                                              session_alias=input_parameters['trader1_fix'])))
     # Check if response is correct
-    if order1_response.status.status != 0:
+    if order1_response.status.status != RequestStatus.SUCCESS:
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
     ###################################################################################################################
 
@@ -163,7 +163,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
                                              session_alias=input_parameters['trader1_fix'])))
 
     # Check if response is correct
-    if order2_response.status.status != 0:
+    if order2_response.status.status != RequestStatus.SUCCESS:
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
     ###################################################################################################################
 
@@ -231,7 +231,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
                                              session_alias=input_parameters['trader2_fix'])))
 
     # Check if response is correct
-    if order3_response.status.status != 0:
+    if order3_response.status.status != RequestStatus.SUCCESS:
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
     ###################################################################################################################
 
