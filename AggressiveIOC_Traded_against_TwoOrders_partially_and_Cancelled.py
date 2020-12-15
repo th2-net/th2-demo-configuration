@@ -133,7 +133,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
                     'MsgType': ValueFilter(simple_filter='f', operation=FilterOperation.NOT_EQUAL)}))}),
             message_filters=[sf.create_filter_object(msg_type='ExecutionReport',
                                                      fields=er1_parameters,
-                                                     key_fields_list=['ClOrdID'])]
+                                                     key_fields_list=['ClOrdID', 'OrdStatus'])]
         ))
     ###################################################################################################################
 
@@ -201,7 +201,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
             pre_filter=PreFilter(fields={'SecurityID': ValueFilter(simple_filter=input_parameters['Instrument'])}),
             message_filters=[sf.create_filter_object(msg_type='ExecutionReport',
                                                      fields=er2_parameters,
-                                                     key_fields_list=['ClOrdID'])]
+                                                     key_fields_list=['ClOrdID', 'OrdStatus'])]
         ))
     ###################################################################################################################
 
@@ -260,7 +260,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     }
     er_2vs3_filter = sf.create_filter_object(msg_type='ExecutionReport',
                                              fields=er_2vs3_parameters,
-                                             key_fields_list=['ClOrdID'])
+                                             key_fields_list=['ClOrdID', 'OrdStatus', 'LeavesQty', 'CumQty'])
 
     # Parameters for Execution Report ExecType=TRADE Order1vsOrder3
     er_1vs3_parameters = {
@@ -286,7 +286,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     }
     er_1vs3_filter = sf.create_filter_object(msg_type='ExecutionReport',
                                              fields=er_1vs3_parameters,
-                                             key_fields_list=['ClOrdID'])
+                                             key_fields_list=['ClOrdID', 'OrdStatus', 'LeavesQty', 'CumQty'])
 
     # Sending request to check1
     sf.submitCheckSequenceRule(
@@ -327,7 +327,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     }
     er_3vs2_filter = sf.create_filter_object(msg_type='ExecutionReport',
                                              fields=er_3vs2_parameters,
-                                             key_fields_list=['ClOrdID'])
+                                             key_fields_list=['ClOrdID', 'OrdStatus', 'LeavesQty', 'CumQty'])
 
     # Parameters for Execution Report ExecType=TRADE Order3vsOrder1
     er_3vs1_parameters = {
@@ -352,7 +352,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     }
     er_3vs1_filter = sf.create_filter_object(msg_type='ExecutionReport',
                                              fields=er_3vs1_parameters,
-                                             key_fields_list=['ClOrdID'])
+                                             key_fields_list=['ClOrdID', 'OrdStatus', 'LeavesQty', 'CumQty'])
 
     # Parameters for Execution Report ExecType=C Order3
     er_cancellation_parameters = {
@@ -375,7 +375,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
     }
     er_cancellation_filter = sf.create_filter_object(msg_type='ExecutionReport',
                                                      fields=er_cancellation_parameters,
-                                                     key_fields_list=['ClOrdID'])
+                                                     key_fields_list=['ClOrdID', 'OrdStatus', 'LeavesQty', 'CumQty'])
 
     # Sending request to check1
     ver2_chain = sf.submitCheckSequenceRule(
@@ -430,21 +430,6 @@ def scenario():
     trader2 = firms[1]['Traders'][0]['TraderName']
     trader2_firm = firms[1]['FirmName']
     trader2_fix = firms[1]['Traders'][0]['TraderConnection']
-
-    # ####REQUEST SECURITY STATUSES##################################
-    mdata_requests_report = sf.create_event_id()
-    # Sending request to estore. Creation of the root Event for all cases performed later.
-    sf.submit_event(
-        estore=factory['estore'],
-        event_batch=sf.create_event_batch(
-            report_name="Prerequisites: Request security statuses",
-            start_timestamp=report_start_timestamp,
-            event_id=mdata_requests_report,
-            parent_id=report_id))
-
-    for instrument in instruments:
-        sf.request_security_status(instrument['SecurityID'], trader1_fix, mdata_requests_report, factory)
-    ##################################################################
 
     case_id = 0
     # Execution of case for every instrument in refdata
