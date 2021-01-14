@@ -82,7 +82,7 @@ def placeOrderFIX(act, place_message_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        raise SystemExit
+        #raise SystemExit
     if act_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -99,7 +99,7 @@ def sendMessage(act, place_message_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        raise SystemExit
+        #raise SystemExit
     if act_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -134,7 +134,7 @@ def submitCheckSequenceRule(check, check_sequence_rule_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        raise SystemExit
+        #raise SystemExit
     if check_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -151,7 +151,7 @@ def submitCheckRule(check, check_rule_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        raise SystemExit
+        #raise SystemExit
     if check_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -273,7 +273,7 @@ def wrap_into_target_party(value_type, repeating_groups):
         return repeating_groups
     else:
         print("Incorrect value type for TradingParty. Only filter or value available")
-        raise SystemExit
+        #raise SystemExit
 
 
 def wrap_into_trading_party(value_type, repeating_groups):
@@ -309,7 +309,7 @@ def wrap_into_trading_party(value_type, repeating_groups):
         return repeating_groups
     else:
         print("Incorrect value type for TradingParty. Only filter or value available")
-        raise SystemExit
+        #raise SystemExit
 
 
 def wrap_into_no_related_sym(value_type, repeating_groups):
@@ -347,7 +347,7 @@ def wrap_into_no_related_sym(value_type, repeating_groups):
         return repeating_groups
     else:
         print("Incorrect value type for NoRelatedSym. Only filter or value available")
-        raise SystemExit
+        #raise SystemExit
 
 
 def request_security_status(instrument, session_alias, event_id, factory):
