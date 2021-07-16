@@ -8,7 +8,7 @@ import time
 from th2_grpc_act_template.act_template_pb2 import PlaceMessageRequest
 from google.protobuf.timestamp_pb2 import Timestamp
 from th2_common.schema.factory.common_factory import CommonFactory
-from th2_grpc_act_template.act_template_service import ActService
+from th2_grpc_act_template.act_service import ActService
 from th2_grpc_check1 import check1_pb2
 from th2_grpc_check1.check1_service import Check1Service
 from th2_grpc_common.common_pb2 import ValueFilter, FilterOperation, MessageMetadata, MessageFilter, ConnectionID, \
@@ -16,11 +16,10 @@ from th2_grpc_common.common_pb2 import ValueFilter, FilterOperation, MessageMeta
 
 
 # -----------Connection functions
-def connect(router_grpc, rabbit_mq, router_mq):
+def connect(config_path):
     try:
         logging.info('Trying to connect...')
-        factory = CommonFactory(grpc_router_config_filepath=router_grpc, rabbit_mq_config_filepath=rabbit_mq,
-                                mq_router_config_filepath=router_mq)
+        factory = CommonFactory(config_path=config_path)
         grpc_router = factory.grpc_router
         act = grpc_router.get_service(ActService)
         check = grpc_router.get_service(Check1Service)
@@ -28,14 +27,15 @@ def connect(router_grpc, rabbit_mq, router_mq):
         logging.info('Connection established.')
         return {'act': act,
                 'check': check,
-                'estore': estore}
+                'estore': estore,
+                'factory': factory}
     except Exception as e:
         logging.error('Unable to connect.')
         logging.error(str(e))
         logging.info('Retry in 3...')
         print(f'Unable to connect: \n {str(e)}')
         time.sleep(3)
-        connect(router_grpc, rabbit_mq, router_mq)
+        connect(config_path)
 
 
 # -------estore functions
@@ -53,7 +53,26 @@ def create_event_id():
     return EventID(id=str(uuid.uuid1()))
 
 
-def create_event_batch(report_name, start_timestamp, event_id, parent_id=None, status='SUCCESS', body=b""):
+def store_event(factory, name, event_id=None, parent_id=None, body=b"", status='SUCCESS', etype=b""):
+    new_event_id = event_id
+    if new_event_id is None:
+        new_event_id = create_event_id()
+    case_start_timestamp = Timestamp()
+    case_start_timestamp.GetCurrentTime()
+    submit_event(
+        estore=factory['estore'],
+        event_batch=create_event_batch(
+            report_name=name,
+            etype=etype,
+            status=status,
+            start_timestamp=case_start_timestamp,
+            event_id=new_event_id,
+            parent_id=parent_id,
+            body=body))
+    return new_event_id
+
+
+def create_event_batch(report_name, start_timestamp, event_id, parent_id=None, status='SUCCESS', body=b"", etype=b""):
     current_timestamp = Timestamp()
     current_timestamp.GetCurrentTime()
     logging.info(f'Storing event {report_name}...')
@@ -62,12 +81,11 @@ def create_event_batch(report_name, start_timestamp, event_id, parent_id=None, s
         name=report_name,
         status=status,
         body=body,
+        type=etype,
         start_timestamp=start_timestamp,
         end_timestamp=current_timestamp,
         parent_id=parent_id)
     event_batch = EventBatch()
-    if parent_id:
-        event_batch.parent_event_id.CopyFrom(parent_id)
     event_batch.events.append(event)
 
     return event_batch
@@ -115,6 +133,8 @@ def get_field_value_from_act_response(response, field):
 def create_message_object(msg_type, fields, session_alias=''):
     fields = copy.deepcopy(fields)
     for field in fields:
+        if field == 'TradingParty' and isinstance(fields[field], list):
+            fields[field] = wrap_into_trading_party("value", fields[field]),
         if isinstance(fields[field], str) or isinstance(fields[field], int) or isinstance(fields[field], float):
             fields[field] = Value(simple_value=str(fields[field]))
     return Message(
@@ -160,11 +180,28 @@ def submitCheckRule(check, check_rule_request):
     return check_response
 
 
+def createCheckpoint(check, parent_id):
+    logging.info('Sending Checkpoint request to check...')
+    try:
+        check_response = check.createCheckpoint(check1_pb2.CheckpointRequest(parent_event_id=parent_id))
+    except Exception as e:
+        logging.error('FATAL ERROR. Unable to proceed.')
+        logging.error(str(e))
+        #raise SystemExit
+    if check_response.status.status == 0:
+        logging.info('Request submitted. Response received.')
+    else:
+        logging.error(f'Request submitted. Check executed incorrectly{str(check_response.status)}.')
+
+    return check_response
+
 def create_filter_object(msg_type, fields, key_fields_list):
     fields = copy.deepcopy(fields)
     for field in fields:
         if fields[field] == '*':
             fields[field] = ValueFilter(operation=FilterOperation.NOT_EMPTY)
+        if field == 'TradingParty' and isinstance(fields[field], list):
+            fields[field] = wrap_into_trading_party("filter", fields[field]),
         if isinstance(fields[field], str) or isinstance(fields[field], int) or isinstance(fields[field], float):
             if field in key_fields_list:
                 fields[field] = ValueFilter(simple_filter=str(fields[field]), key=True)
@@ -310,6 +347,10 @@ def wrap_into_trading_party(value_type, repeating_groups):
     else:
         print("Incorrect value type for TradingParty. Only filter or value available")
         #raise SystemExit
+
+
+def to_msg_body(string):
+    return bytes('[{"data":"' + string + '", "type":"message" } ]', 'utf-8')
 
 
 def wrap_into_no_related_sym(value_type, repeating_groups):
