@@ -1,4 +1,15 @@
-# How to start:
+# Description:
+The th2-script is a code, which contains a set of requests to the th2 components, executed in turns. The script can be written in any language that supports a common library. This script is written on python and contains three general types of actions.
+
+* Requests to **the act** for sending messages that are executed synchronously. This means that we are sending a request and waiting for the result of its execution.
+
+* Requests to **the check1** for message verification based on the expected results that are executed asynchronously. This means that we are not waiting for the check to be completed.
+
+* Sending events to **the estore** queue.
+
+## How to start:
+**Schema(th2 environment) needed:** https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.5.3-main_scenario
+
 Python 3.7+ environment required.
 1. Change **configs** based on your **RabbitMQ** , **act** and **check1**
     1. Fill **grpc.json** in a folder **config** with the host, and the port of your **act** and **check1** pods. You can found it in Kubernetes Dashboard in Services tab or execute in kubectl - kubectl get services
@@ -7,7 +18,7 @@ Python 3.7+ environment required.
 1. Install required packages described in **requirements.txt**
 1. Start **run.py**
 
-# Test Scenario:
+## Test Scenario:
 
 1. User1 submit passive buy order with Price=x and Size=30 - **Order1**
 1. User1 receives an Execution Report with ExecType=0
@@ -19,3 +30,6 @@ Python 3.7+ environment required.
     1. User1 receives an Execution Report with ExecType=F on trade between **Order1** and **Order3**
     1. User2 receives an Execution Report with ExecType=F on trade between **Order3** and **Order1**
     1. User2 receives an Execution Report with ExecType=C on expired **Order3**
+
+
+
