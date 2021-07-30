@@ -5,7 +5,11 @@ The th2-script is a code, which contains a set of requests to the th2 components
 
 * Requests to **the check1** for message verification based on the expected results that are executed asynchronously. This means that we are not waiting for the check to be completed.
 
-* Sending events to **the estore** queue.
+* Sending events to **the estore** queue to organize test results into a structure, or to supplement information in the report.
+
+**Schema of a simplified example script:**
+
+<img src="https://github.com/th2-net/th2-documentation/blob/master/images/demo-ver154-main/script-base-flow.png" data-canonical-src="https://github.com/th2-net/th2-documentation/blob/master/images/demo-ver154-main/script-base-flow.png"  />
 
 ## How to start:
 **Schema(th2 environment) needed:** https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.5.4-main_scenario
