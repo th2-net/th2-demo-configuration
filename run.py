@@ -1,6 +1,9 @@
 from __future__ import print_function
 
+import datetime
 import logging
+import pickle
+import subprocess
 import time
 
 import yaml
@@ -74,10 +77,30 @@ def scenario(factory, parent=None):
 
 if __name__ == '__main__':
     logging.basicConfig(filename=time.asctime().replace(':', '-') + ' script.log',
-                        level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+                        level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     # Creation of grpc channels and instances of act, check1 and estore stubs.
     factory = sf.connect(config_path="./configs/")
     try:
+        start_datetime = datetime.datetime.now()
         scenario(factory)
+        time.sleep(10)
+        finish_datetime = datetime.datetime.now()
+
+        print(F"start datetime: {start_datetime}")
+        print(F"finish datetime: {finish_datetime}")
+
+        print(F"Data Services - start")
+        with open('scenarios/data_services/start_datetime.pickle', 'wb') as f:
+            pickle.dump(start_datetime, f)
+        with open('scenarios/data_services/finish_datetime.pickle', 'wb') as f:
+            pickle.dump(finish_datetime, f)
+
+        with subprocess.Popen('jupyter notebook scenarios/data_services/notebook.ipynb'.split()) as p:
+            x = None
+            time.sleep(10)
+            while x not in ['Y', 'y']:
+                x = input("Enter Y/y to close DataServices and finish demo script: ")
+            p.kill()
+
     finally:
         factory['factory'].close()
