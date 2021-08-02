@@ -16,7 +16,7 @@ from th2_grpc_common.common_pb2 import ValueFilter, FilterOperation, MessageMeta
 
 
 # -----------Connection functions
-def connect(config_path):
+def connect(config_path, tries=3):
     try:
         logging.info('Trying to connect...')
         factory = CommonFactory(config_path=config_path)
@@ -30,13 +30,15 @@ def connect(config_path):
                 'estore': estore,
                 'factory': factory}
     except Exception as e:
-        logging.error('Unable to connect.')
-        logging.error(str(e))
-        logging.info('Retry in 3...')
-        print(f'Unable to connect: \n {str(e)}')
-        time.sleep(3)
-        connect(config_path)
-
+        if tries > 0:
+            logging.error('Unable to connect.')
+            logging.error(str(e))
+            logging.info('Retry in 3...')
+            print(f'Unable to connect: \n {str(e)}')
+            time.sleep(3)
+            connect(config_path, tries-1)
+        else:
+            raise
 
 # -------estore functions
 def submit_event(estore, event_batch):
