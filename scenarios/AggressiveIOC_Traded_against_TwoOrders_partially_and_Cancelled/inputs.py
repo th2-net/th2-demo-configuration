@@ -46,6 +46,7 @@ class Inputs:
             'ClOrdID': sf.generate_client_order_id(7),
             'SecondaryClOrdID': '11111',
             'Side': "1",
+            'TimeInForce': '0',
             'TransactTime': (datetime.now().isoformat()),
             'TradingParty': self.trading_party1
         }
@@ -57,6 +58,7 @@ class Inputs:
             'OrdType': "2",
             'AccountType': "1",
             'OrderCapacity': "A",
+            'TimeInForce': '0',
             'OrderQty': self.input_parameters['Order2Qty'],
             'Price': self.input_parameters['Order2Price'],
             'ClOrdID': sf.generate_client_order_id(7),
