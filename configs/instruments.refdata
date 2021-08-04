@@ -3,11 +3,17 @@
   'Price': 55
 - 'SecurityID': 'INSTR2'
   'Price': 35
+  'Issue': 'TEST-44'
 - 'SecurityID': 'INSTR3'
   'Price': 75
+  'Issue': 'TEST-44'
 - 'SecurityID': 'INSTR4'
   'Price': 45
+  'Issue': 'TEST-45'
+  'Folder': TestFolder
 - 'SecurityID': 'INSTR5'
   'Price': 65
+  'Issue': 'TEST-44'
 - 'SecurityID': 'INSTR6'
   'Price': 65
+  'Issue': 'TEST-45'

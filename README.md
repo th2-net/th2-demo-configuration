@@ -19,8 +19,10 @@ Python 3.7+ environment required.
     1. Fill **grpc.json** in a folder **config** with the host, and the port of your **act** and **check1** pods. You can found it in Kubernetes Dashboard in Services tab or execute in kubectl - kubectl get services
     1. Fill **mq.json** in a folder **config** with **RabbitMQ exchange** and **routing key** from **script** to **estore**. You can find this queue in Kubernetes Dashboard in Config Maps tab - script-entry-point-app-config. 
     1. Fill **rabbitMQ.json** in a folder **config** with your **RabbitMQ credentials**. You can find these credentials in Kubernetes Dashboard in Config Maps tab - rabbit-mq-app-config.
-1. Install required packages described in **requirements.txt**
-1. Start **run.py**
+2. Install required packages described in **requirements.txt**
+3. Set the environment variable `JIRA_PROJECT_VERSION` with the version for which you want to create a test execution
+4. Set the environment variable `ZEPHYR_CYCLE` with the name for the cycle in Zephyr
+5. Start **run.py**
 
 ## Test Scenario:
 
@@ -35,5 +37,11 @@ Python 3.7+ environment required.
     1. User2 receives an Execution Report with ExecType=F on trade between **Order3** and **Order1**
     1. User2 receives an Execution Report with ExecType=C on expired **Order3**
 
+## Enabling synchronisation with Zephyr
 
+For synchronization with Zephyr you need to specify the `Issue` key for test-case in `configs/instruments.refdata` file.
+This parameter should contain the Zephyr's test issue key.
+If several test-cases have the same issue specified they will be grouped under the common event.
 
+You can also add a `Folder` parameter. That will allow you to add the execution to a specific folder under the specified cycle.
+If several test-cases have the same folder specified they will be grouped under the common event.
