@@ -14,3 +14,6 @@ th2-common==3.2.1
 th2-grpc-act-template==3.1.2
 th2-grpc-check1==3.1.4
 th2-data-services==0.2.4
+
+th2-grpc-hand==2.8.0
+th2-grpc-act-uiframework-web-demo==3.2.0
