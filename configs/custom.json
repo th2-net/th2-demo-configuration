@@ -1,0 +1,10 @@
+{
+  "target_server_win": "win_session",
+  "application_folder": "C:\\Program Files (x86)\\MiniFIX\\",
+  "exec_file": "MiniFIX.exe",
+
+  "sender_comp_id": "DEMO-CONN2",
+  "target_comp_id": "FGW",
+  "fix_server_host": "th2-cluster",
+  "fix_server_port": "31681"
+}

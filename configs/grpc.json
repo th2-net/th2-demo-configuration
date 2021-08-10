@@ -25,6 +25,19 @@
         "name": "robin",
         "endpoints": ["check1"]
       }
+    },
+    "MiniFixDemoAct": {
+      "service-class": "UIFrameworkActService",
+      "endpoints": {
+        "winact": {
+          "host": "0.0.0.0",
+          "port": 0
+        }
+      },
+      "strategy": {
+        "name": "robin",
+        "endpoints": ["winact"]
+      }
     }
   }
 }

@@ -40,6 +40,24 @@ def connect(config_path, tries=3):
         else:
             raise
 
+
+def simple_connect(config_path, tries=3):
+    try:
+        logging.info('Trying to connect...')
+        factory = CommonFactory(config_path=config_path)
+        logging.info('Connection established.')
+        return factory
+    except Exception as e:
+        if tries > 0:
+            logging.error('Unable to connect.')
+            logging.error(str(e))
+            logging.info('Retry in 3...')
+            print(f'Unable to connect: \n {str(e)}')
+            time.sleep(3)
+            connect(config_path, tries-1)
+        else:
+            raise
+
 # -------estore functions
 def submit_event(estore, event_batch):
     logging.debug(f'Event content:{str(event_batch)}')
