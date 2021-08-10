@@ -26,7 +26,6 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
             parent_id=report_id))
     ###################################################################################################################
     input = Inputs(input_parameters)
-    time.sleep(5)  # https://exactpro.atlassian.net/browse/TH2-2078
     # ######STEP1 - TRADER1 SENDS PASSIVE BUY ORDER WITH PRICE = X ####################################################
     # Sending message to act and waiting for response
     order1_response = sf.placeOrderFIX(
