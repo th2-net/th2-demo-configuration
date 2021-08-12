@@ -8,7 +8,7 @@ The th2-script is a code, which contains a set of requests to the th2 components
 * Sending events to **the estore** queue to organize test results into a structure, or to supplement information in the report.
 
 ## How to start:
-**Schema(th2 environment) needed:** TBD
+**Schema(th2 environment) needed:** https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.5.4-hand_web_scenario
 
 Python 3.7+ environment required.
 1. Change **configs** based on your **RabbitMQ** , **act** and **check1**
