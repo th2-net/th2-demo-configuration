@@ -9,14 +9,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import copy
+from dataclasses import dataclass
 
 from th2_grpc_act_uiframework_win_demo.uiframework_win_demo_pb2 import BaseMessage, OpenApplicationRequest, \
     InitConnectionRequest, SendNewOrderSingleRequest, ExtractLastOrderDetailsRequest
 from th2_grpc_check1.check1_pb2 import CheckpointRequest, CheckRuleRequest
-from th2_grpc_common.common_pb2 import ConnectionID, ValueFilter, MessageFilter, FilterOperation
+from th2_grpc_common.common_pb2 import ConnectionID, ValueFilter, MessageFilter, FilterOperation, RootMessageFilter, \
+    MetadataFilter, ListValueFilter
 from th2_grpc_hand import rhbatch_pb2
-
-from dataclasses import dataclass
 
 from custom.support_functions import store_event, generate_client_order_id
 
@@ -32,26 +32,38 @@ def create_order_params() -> list:
             Tag('453', 'NoPartyIDs', '0')]
 
 
-def create_check_rule_request(description, connectivity, checkpoint, timeout, event_id, message_filter):
+def create_check_rule_request(description, connectivity, checkpoint, timeout, event_id, root_filter):
     connectivity = ConnectionID(session_alias=connectivity)
     return CheckRuleRequest(connectivity_id=connectivity,
-                            filter=message_filter,
+                            root_filter=root_filter,
                             checkpoint=checkpoint,
                             timeout=timeout,
                             parent_event_id=event_id,
                             description=description)
 
 
-def create_filter_fields(fields, key_fields_list):
+def create_filter_fields(fields, key_fields_list, extract_fields=False):
     fields = copy.deepcopy(fields)
     for field in fields:
         if fields[field] == '*':
             fields[field] = ValueFilter(operation=FilterOperation.NOT_EMPTY)
-        if isinstance(fields[field], str) or isinstance(fields[field], int) or isinstance(fields[field], float):
+        if extract_fields:
+            value = fields[field].value
+        else:
+            value = fields[field]
+        if isinstance(value, str) or isinstance(value, int) or isinstance(value, float):
             if field in key_fields_list:
-                fields[field] = ValueFilter(simple_filter=str(fields[field]), key=True)
+                fields[field] = ValueFilter(simple_filter=str(value), key=True)
             else:
-                fields[field] = ValueFilter(simple_filter=str(fields[field]))
+                fields[field] = ValueFilter(simple_filter=str(value))
+        if isinstance(value, list):
+            list_value_filter = ListValueFilter()
+            for current_value in value:
+                if isinstance(current_value, dict):
+                    message_filter = MessageFilter(
+                        fields=create_filter_fields(current_value, key_fields_list, extract_fields))
+                    list_value_filter.values.append(ValueFilter(message_filter=message_filter))
+            fields[field] = ValueFilter(list_filter=list_value_filter)
     return fields
 
 
@@ -105,11 +117,12 @@ def extract_last_order_details(factory, base_message):
                                                                        "OrderQty", "Price",
                                                                        "LeavesQty", "ExecID",
                                                                        "OrderID", "Text"])
-    return dict(factory['win_act'].extractLastOrderDetails(details_request).data)
+    details = factory['win_act'].extractLastOrderDetails(details_request)
+    return details.executionId, dict(details.data)
 
 
 def extract_last_system_message(factory, base_message):
-    return dict(factory['win_act'].extractLastSystemMessage(base_message).data)
+    return factory['win_act'].extractLastSystemMessage(base_message)
 
 
 def create_checkpoint(factory, base_message):
@@ -117,7 +130,25 @@ def create_checkpoint(factory, base_message):
     return factory['check'].createCheckpoint(checkpoint_request).checkpoint
 
 
-def check_fix_message(factory, base_message, checkpoint, tags, fields_set):
+def create_root_filter(exp_fields, execution_id, extract_values=False, message_type="FIX",
+                       root_message_type="ExecutionReport", key_fields_list=["ClOrdID"], skip_metadata=False):
+    message_filter = RootMessageFilter(
+        messageType=root_message_type,
+        message_filter=MessageFilter(
+            fields=create_filter_fields(fields=exp_fields, key_fields_list=key_fields_list,
+                                        extract_fields=extract_values))
+    )
+    if not skip_metadata:
+        message_filter.metadata_filter.CopyFrom(MetadataFilter(
+            property_filters={
+                "MessageType": MetadataFilter.SimpleFilter(value=message_type),
+                "ExecutionId": MetadataFilter.SimpleFilter(value=execution_id)
+            }
+        ))
+    return message_filter
+
+
+def check_fix_message(factory, base_message, checkpoint, tags, fields_set, execution_id):
     exp_fields = {}
     for tag_data in tags:
         if tag_data.tag_name in fields_set:
@@ -130,13 +161,38 @@ def check_fix_message(factory, base_message, checkpoint, tags, fields_set):
             checkpoint=checkpoint,
             timeout=5000,
             event_id=base_message.parentEventId,
-            message_filter=MessageFilter(messageType='ExecutionReport',
-                                         fields=create_filter_fields(fields=exp_fields,
-                                                                     key_fields_list=["ClOrdID"]))
+            root_filter=create_root_filter(exp_fields, execution_id)
         ))
 
 
-def check_fix_message_failed(factory, base_message, checkpoint, tags, fields_set):
+def check_hand_message(factory, base_message, checkpoint, result_id, execution_id):
+    exp_fields = {
+        "ActionResults": [
+            {
+                "data": 98,
+                "id": result_id
+            }
+        ],
+        "ExecutionId": execution_id,
+        "MessageType": "PLAIN_STRING",
+        "RhSessionId": "th2_hand"
+    }
+
+    factory['check'].submitCheckRule(
+        create_check_rule_request(
+            description="Check extracted value from MiniFix against expected result from script",
+            connectivity="th2-hand-demo",
+            checkpoint=checkpoint,
+            timeout=5000,
+            event_id=base_message.parentEventId,
+            root_filter=create_root_filter(exp_fields, execution_id, message_type="th2-hand",
+                                           root_message_type="th2-hand", key_fields_list=["ExecutionId", "id"],
+                                           skip_metadata=True)
+        )
+    )
+
+
+def check_fix_message_failed(factory, base_message, checkpoint, tags, fields_set, execution_id):
     exp_fields = {}
     for tag_data in tags:
         if tag_data.tag_name in fields_set:
@@ -151,13 +207,12 @@ def check_fix_message_failed(factory, base_message, checkpoint, tags, fields_set
             checkpoint=checkpoint,
             timeout=5000,
             event_id=base_message.parentEventId,
-            message_filter=MessageFilter(messageType='ExecutionReport',
-                                         fields=create_filter_fields(fields=exp_fields,
-                                                                     key_fields_list=["ClOrdID"]))
+            root_filter=create_root_filter(exp_fields, execution_id)
         ))
 
 
-def check_fix_message_against_table(factory, base_message, checkpoint, check_fields):
+def check_fix_message_against_table(factory, base_message, checkpoint, check_fields, execution_id):
+    RootMessageFilter()
     factory['check'].submitCheckRule(
         create_check_rule_request(
             description="Check consistency raw Execution Report with displayed in table in MiniFixUI",
@@ -165,9 +220,7 @@ def check_fix_message_against_table(factory, base_message, checkpoint, check_fie
             checkpoint=checkpoint,
             timeout=5000,
             event_id=base_message.parentEventId,
-            message_filter=MessageFilter(messageType='ExecutionReport',
-                                         fields=create_filter_fields(fields=check_fields,
-                                                                     key_fields_list=["ClOrdID"]))
+            root_filter=create_root_filter(check_fields, execution_id, True)
         ))
 
 
@@ -178,11 +231,16 @@ def run(factory):
     checkpoint = create_checkpoint(factory, base_message)
     params = create_order_params()
     send_new_order_single(factory, base_message, params)
-    extracted_details = extract_last_order_details(factory, base_message)
-    extract_last_system_message(factory, base_message)
-    check_fix_message(factory, base_message, checkpoint, params, {'ClOrdID', 'Price', 'OrderQty', 'OrdType', 'Side'})
-    check_fix_message_against_table(factory, base_message, checkpoint, extracted_details)
+    execution_id, extracted_details = extract_last_order_details(factory, base_message)
+    extracted_system_message = extract_last_system_message(factory, base_message)
+    last_system_message_execution_id = extracted_system_message.executionId
+    check_fix_message(factory, base_message, checkpoint, params, {'ClOrdID', 'Price', 'OrderQty', 'OrdType', 'Side'},
+                      last_system_message_execution_id)
+    check_fix_message_against_table(factory, base_message, checkpoint, extracted_details,
+                                    last_system_message_execution_id)
     check_fix_message_failed(factory, base_message, checkpoint, params,
-                             {'ClOrdID', 'Price', 'OrderQty', 'OrdType', 'Side'})
+                             {'ClOrdID', 'Price', 'OrderQty', 'OrdType', 'Side'}, last_system_message_execution_id)
+
+    check_hand_message(factory, base_message, checkpoint, "extractCellNameElId_8", execution_id)
     factory['win_act'].closeConnection(base_message)
     factory['win_act'].closeApplication(base_message)
