@@ -410,3 +410,20 @@ def request_security_status(instrument, session_alias, event_id, factory):
             message=create_message_object(msg_type='SecurityStatusRequest',
                                              fields=sec_status_request,
                                              session_alias=session_alias)))
+
+
+def market_data_request(act, place_message_request):
+    logging.info('Sending request to act...')
+    logging.debug(str(place_message_request))
+    try:
+        act_response = act.marketdatarequest(place_message_request)
+    except Exception as e:
+        logging.error('FATAL ERROR. Unable to proceed.')
+        logging.error(str(e))
+        # raise SystemExit
+    if act_response.status.status == 0:
+        logging.info('Request submitted. Response received.')
+    else:
+        logging.error(f'Request submitted. Act rule executed incorrectly{str(act_response.status)}.')
+
+    return act_response
