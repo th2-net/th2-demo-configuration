@@ -14,11 +14,11 @@ class Inputs:
 
     def __init__(self, input_parameters):
         self.input_parameters = input_parameters
-        self.request1 = self.m_k_d_f()
-        self.request2 = self.m_k_d_t()
-        self.request3 = self.m_k_d_us()
+        self.request1 = self.m_d_r_f()
+        self.request2 = self.m_d_r_t()
+        self.request3 = self.m_d_r_us()
 
-    def m_k_d_f(self) -> dict:
+    def m_d_r_f(self) -> dict:
         return {
             'MDReqID': "34965",
             'SubscriptionRequestType': '0',
@@ -29,7 +29,7 @@ class Inputs:
             'Component Block': self.input_parameters['Instruments'],
         }
 
-    def m_k_d_t(self) -> dict:
+    def m_d_r_t(self) -> dict:
         return {
             'MDReqID': "34966",
             'SubscriptionRequestType': '1',
@@ -41,7 +41,7 @@ class Inputs:
             'Component Block': self.input_parameters['Instrument'],
         }
 
-    def m_k_d_f(self) -> dict:
+    def m_d_r_us(self) -> dict:
         return {
             'MDReqID': "34966",
             'SubscriptionRequestType': '2',
