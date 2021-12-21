@@ -13,7 +13,7 @@ from dataclasses import dataclass
 
 from th2_grpc_act_uiframework_win_demo.uiframework_win_demo_pb2 import BaseMessage, OpenApplicationRequest, \
     InitConnectionRequest, SendNewOrderSingleRequest, ExtractLastOrderDetailsRequest
-from th2_grpc_check1.check1_pb2 import CheckpointRequest, CheckRuleRequest
+from th2_grpc_check1.check1_pb2 import CheckpointRequest, CheckRuleRequest, CheckSequenceRuleRequest
 from th2_grpc_common.common_pb2 import ConnectionID, ValueFilter, MessageFilter, FilterOperation, RootMessageFilter, \
     MetadataFilter, ListValueFilter
 from th2_grpc_hand import rhbatch_pb2
@@ -40,6 +40,16 @@ def create_check_rule_request(description, connectivity, checkpoint, timeout, ev
                             timeout=timeout,
                             parent_event_id=event_id,
                             description=description)
+
+
+def create_check_sequence_rule_request(description, connectivity, checkpoint, timeout, event_id, root_filters):
+    connectivity = ConnectionID(session_alias=connectivity)
+    return CheckSequenceRuleRequest(connectivity_id=connectivity,
+                                    root_message_filters=root_filters,
+                                    checkpoint=checkpoint,
+                                    timeout=timeout,
+                                    parent_event_id=event_id,
+                                    description=description)
 
 
 def create_filter_fields(fields, key_fields_list, extract_fields=False):
@@ -165,12 +175,12 @@ def check_fix_message(factory, base_message, checkpoint, tags, fields_set, execu
         ))
 
 
-def check_hand_message(factory, base_message, checkpoint, result_id, execution_id):
-    exp_fields = {
+def check_hand_message(factory, base_message, checkpoint, execution_id):
+    price_fields = {
         "ActionResults": [
             {
                 "data": 98,
-                "id": result_id
+                "id": "extractCellNameElId_8"
             }
         ],
         "ExecutionId": execution_id,
@@ -178,16 +188,30 @@ def check_hand_message(factory, base_message, checkpoint, result_id, execution_i
         "RhSessionId": "th2_hand"
     }
 
-    factory['check'].submitCheckRule(
-        create_check_rule_request(
+    text_fields = {
+        "ActionResults": [
+            {
+                "data": "Simulated New Order Buy is placed",
+                "id": "extractCellNameElId_10"
+            }
+        ],
+        "ExecutionId": execution_id,
+        "MessageType": "PLAIN_STRING",
+        "RhSessionId": "th2_hand"
+    }
+
+    price_filter = create_root_filter(price_fields, execution_id, message_type="th2-hand", root_message_type="th2-hand",
+                                      key_fields_list=["ExecutionId", "id"], skip_metadata=True)
+    text_filter = create_root_filter(text_fields, execution_id, message_type="th2-hand", root_message_type="th2-hand",
+                                     key_fields_list=["ExecutionId", "id"], skip_metadata=True)
+    factory['check'].submitCheckSequenceRule(
+        create_check_sequence_rule_request(
             description="Check extracted value from MiniFix against expected result from script",
             connectivity="th2-hand-demo",
             checkpoint=checkpoint,
             timeout=5000,
             event_id=base_message.parentEventId,
-            root_filter=create_root_filter(exp_fields, execution_id, message_type="th2-hand",
-                                           root_message_type="th2-hand", key_fields_list=["ExecutionId", "id"],
-                                           skip_metadata=True)
+            root_filters=[price_filter, text_filter],
         )
     )
 
@@ -241,6 +265,6 @@ def run(factory):
     check_fix_message_failed(factory, base_message, checkpoint, params,
                              {'ClOrdID', 'Price', 'OrderQty', 'OrdType', 'Side'}, last_system_message_execution_id)
 
-    check_hand_message(factory, base_message, checkpoint, "extractCellNameElId_8", execution_id)
+    check_hand_message(factory, base_message, checkpoint, execution_id)
     factory['win_act'].closeConnection(base_message)
     factory['win_act'].closeApplication(base_message)
