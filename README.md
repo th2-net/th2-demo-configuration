@@ -4,6 +4,7 @@
 ## Main Test Scenario - branch ver-1.6.1-main_scenario:
 ### Suitable schema configuration:
 https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.6.1-main_scenario
+
 Updated ver-1.5.3-main_scenario.
 
 
