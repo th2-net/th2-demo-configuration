@@ -12,7 +12,7 @@ The th2-script is a code, which contains a set of requests to the th2 components
 <img src="https://github.com/th2-net/th2-documentation/blob/master/images/demo-ver154-main/script-base-flow.png" data-canonical-src="https://github.com/th2-net/th2-documentation/blob/master/images/demo-ver154-main/script-base-flow.png"  />
 
 ## How to start:
-**Schema(th2 environment) needed:** https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.5.4-main_scenario
+**Schema(th2 environment) needed:** https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.6.1-main_scenario
 
 Python 3.7+ environment required.
 1. Change **configs** based on your **RabbitMQ** , **act** and **check1**

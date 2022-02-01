@@ -19,7 +19,7 @@ from th2_grpc_common.common_pb2 import ValueFilter, FilterOperation, MessageMeta
 def connect(config_path, tries=3):
     try:
         logging.info('Trying to connect...')
-        factory = CommonFactory(config_path=config_path)
+        factory = CommonFactory(config_path=config_path, logging_config_filepath="configs/log4py.conf")
         grpc_router = factory.grpc_router
         act = grpc_router.get_service(ActService)
         check = grpc_router.get_service(Check1Service)
