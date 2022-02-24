@@ -40,12 +40,12 @@ def create_event_id():
     return EventID(id=str(uuid.uuid1()))
 
 
-def send_parent(factory, start_timestamp, event_id, status, body=b"", etype=b""):
+def send_root(factory, start_timestamp, event_id, name, status, body=b"", etype=b""):
     current_timestamp = Timestamp()
     current_timestamp.GetCurrentTime()
     parent = Event(
         id=event_id,
-        name="test",
+        name=name,
         status=status,
         body=body,
         type=etype,
@@ -60,19 +60,20 @@ def send_parent(factory, start_timestamp, event_id, status, body=b"", etype=b"")
     )
 
 
-def send_child(factory, event_id, parent_id, start_timestamp, status, body=b"", etype=b""):
+def send_event(factory, start_timestamp, event_id, parent_id, name, status, body=b"", etype=b""):
     current_timestamp = Timestamp()
     current_timestamp.GetCurrentTime()
 
     child = Event(
         id=event_id,
-        name="test",
+        parent_id=parent_id,
+        name=name,
         status=status,
         body=body,
         type=etype,
         start_timestamp=start_timestamp,
         end_timestamp=current_timestamp,
-        parent_id=parent_id)
+    )
 
     event_batch = EventBatch()
     event_batch.events.append(child)
@@ -80,4 +81,3 @@ def send_child(factory, event_id, parent_id, start_timestamp, status, body=b"", 
         estore=factory['estore'],
         event_batch=event_batch
     )
-

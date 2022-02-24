@@ -4,17 +4,9 @@ import datetime
 import logging
 import time
 
-import yaml
 from google.protobuf.timestamp_pb2 import Timestamp
-from th2_grpc_common.common_pb2 import EventBatch
 
 from custom import support_functions as sf
-
-# IMPORT REFDATA FROM FILES
-with open('configs/instruments.refdata') as f:
-    instruments = yaml.load(f, Loader=yaml.FullLoader)
-with open('configs/firms.refdata') as f:
-    firms = yaml.load(f, Loader=yaml.FullLoader)
 
 
 def scenario(factory):
@@ -27,65 +19,71 @@ def scenario(factory):
     # CASE 1
     parent_id = sf.create_event_id()
 
-    sf.send_child(
+    sf.send_event(
         factory=factory,
+        start_timestamp=report_start_timestamp,
         event_id=sf.create_event_id(),
         parent_id=parent_id,
-        start_timestamp=report_start_timestamp,
+        name='CASE_1',
         status='FAILED')
 
-    sf.send_parent(
+    sf.send_root(
         factory=factory,
         start_timestamp=report_start_timestamp,
         event_id=parent_id,
+        name='CASE_1',
         status='FAILED')
-    print("Send CASE1")
 
     # CASE 2
     parent_id = sf.create_event_id()
-    sf.send_child(
+    sf.send_event(
         factory=factory,
+        start_timestamp=report_start_timestamp,
         event_id=sf.create_event_id(),
         parent_id=parent_id,
-        start_timestamp=report_start_timestamp,
+        name='CASE_2',
         status='FAILED')
 
     time.sleep(1)
 
-    sf.send_parent(
+    sf.send_root(
         factory=factory,
         start_timestamp=report_start_timestamp,
         event_id=parent_id,
+        name='CASE_2',
         status='FAILED')
-    print("Send CASE2")
 
     # CASE 3
     parent_id = sf.create_event_id()
-    sf.send_child(
+    sf.send_event(
         factory=factory,
+        start_timestamp=report_start_timestamp,
         event_id=sf.create_event_id(),
         parent_id=parent_id,
-        start_timestamp=report_start_timestamp,
+        name='CASE_3',
         status='FAILED')
 
+    # time exceeding the waiting time parent_event_id
     time.sleep(40)
 
     parent_id = sf.create_event_id()
-    sf.send_child(
+    sf.send_event(
         factory=factory,
+        start_timestamp=report_start_timestamp,
         event_id=sf.create_event_id(),
         parent_id=parent_id,
-        start_timestamp=report_start_timestamp,
+        name='CASE_3',
         status='FAILED')
 
+    # time exceeding the waiting step parent_event_id
     time.sleep(10)
 
-    sf.send_parent(
+    sf.send_root(
         factory=factory,
         start_timestamp=report_start_timestamp,
         event_id=parent_id,
+        name='CASE_3',
         status='FAILED')
-    print("Send CASE3")
 
 
 if __name__ == '__main__':
