@@ -10,15 +10,13 @@ from custom import support_functions as sf
 
 
 def scenario(factory):
-    # Storing grpc Timestamp of script start.
+    # Sending request to estore. Creation of the root Event for all cases performed.
+
     report_start_timestamp = Timestamp()
     report_start_timestamp.GetCurrentTime()
 
-    # Sending request to estore. Creation of the root Event for all cases performed.
-
     # CASE 1
     parent_id = sf.create_event_id()
-
     sf.send_event(
         factory=factory,
         start_timestamp=report_start_timestamp,
@@ -63,9 +61,12 @@ def scenario(factory):
         name='CASE_3',
         status='FAILED')
 
-    # time exceeding the waiting time parent_event_id
-    time.sleep(30)
+    # time exceeding the waiting time
+    time.sleep(150)
 
+    report_start_timestamp = Timestamp()
+    report_start_timestamp.GetCurrentTime()
+    
     sf.send_event(
         factory=factory,
         start_timestamp=report_start_timestamp,
