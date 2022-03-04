@@ -34,15 +34,27 @@ def scenario(factory):
 
     # CASE 2
     parent_id = sf.create_event_id()
+    child_id = sf.create_event_id()
     sf.send_event(
         factory=factory,
         start_timestamp=report_start_timestamp,
         event_id=sf.create_event_id(),
-        parent_id=parent_id,
+        parent_id=child_id,
         name='CASE_2',
         status='FAILED')
 
     time.sleep(1)
+
+    report_start_timestamp = Timestamp()
+    report_start_timestamp.GetCurrentTime()
+
+    sf.send_event(
+        factory=factory,
+        start_timestamp=report_start_timestamp,
+        event_id=child_id,
+        parent_id=parent_id,
+        name='CASE_2',
+        status='SUCCESS')
 
     sf.send_root(
         factory=factory,
@@ -62,11 +74,11 @@ def scenario(factory):
         status='FAILED')
 
     # time exceeding the waiting time
-    time.sleep(150)
+    time.sleep(80)
 
     report_start_timestamp = Timestamp()
     report_start_timestamp.GetCurrentTime()
-    
+
     sf.send_event(
         factory=factory,
         start_timestamp=report_start_timestamp,

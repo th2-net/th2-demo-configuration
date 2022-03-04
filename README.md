@@ -16,8 +16,7 @@ Python 3.7+ environment required.
 
 ## Test Scenario:
 
-1. Sending a child event with the FAILED status and a trace of the parent event.
-2. Sending a child event with the FAILED status, pausing for one second and sending the parent event.
-3. Sending a child event with the FAILED status, a pause exceeding the waiting time of parentId in crawler-process-healer, sending a child event with the FAILED status and a trace of the parent event.
-
+1. Sending a child event with the FAILED status and a parent event with the SUCCESS status.
+2. Sending a grandchild event with the FAILED status, a pause of one second, and sending a child and parent event with the SUCCESS statuses.
+3. Sending a child event with the FAILED status, a pause exceeding the ParentID timeout, sending a child event with the FAILED status and a parent event with the SUCCESS status.
 
