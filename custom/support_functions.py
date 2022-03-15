@@ -2,6 +2,7 @@ from __future__ import print_function
 
 import copy
 import logging
+from optparse import Values
 import random
 import uuid
 import time
@@ -16,7 +17,7 @@ from th2_grpc_common.common_pb2 import ValueFilter, FilterOperation, MessageMeta
 
 
 # -----------Connection functions
-def connect(config_path, tries=3):
+def connect(config_path):
     try:
         logging.info('Trying to connect...')
         factory = CommonFactory(config_path=config_path)
@@ -30,15 +31,13 @@ def connect(config_path, tries=3):
                 'estore': estore,
                 'factory': factory}
     except Exception as e:
-        if tries > 0:
-            logging.error('Unable to connect.')
-            logging.error(str(e))
-            logging.info('Retry in 3...')
-            print(f'Unable to connect: \n {str(e)}')
-            time.sleep(3)
-            connect(config_path, tries-1)
-        else:
-            raise
+        logging.error('Unable to connect.')
+        logging.error(str(e))
+        logging.info('Retry in 3...')
+        print(f'Unable to connect: \n {str(e)}')
+        time.sleep(3)
+        connect(config_path)
+
 
 # -------estore functions
 def submit_event(estore, event_batch):
@@ -110,6 +109,21 @@ def placeOrderFIX(act, place_message_request):
 
     return act_response
 
+def market_data_request(act, place_message_request):
+    logging.info('Sending request to act...')
+    logging.debug(str(place_message_request))
+    try:
+        act_response = act.marketdatarequest(place_message_request)
+    except Exception as e:
+        logging.error('FATAL ERROR. Unable to proceed.')
+        logging.error(str(e))
+        #raise SystemExit
+    if act_response.status.status == 0:
+        logging.info('Request submitted. Response received.')
+    else:
+        logging.error(f'Request submitted. Act rule executed incorrectly{str(act_response.status)}.')
+
+    return act_response
 
 def sendMessage(act, place_message_request):
     logging.info('Sending request to act...')
@@ -136,7 +150,22 @@ def create_message_object(msg_type, fields, session_alias=''):
     fields = copy.deepcopy(fields)
     for field in fields:
         if field == 'TradingParty' and isinstance(fields[field], list):
-            fields[field] = wrap_into_trading_party("value", fields[field]),
+            fields[field] = wrap_into_trading_party("value", fields[field])
+
+        if field == 'NoMDEntryTypes' and isinstance(fields[field], list):
+            fields[field] = wrap_no_md_entery_type(fields[field])
+            #for gid in range(len(fields[field])):
+            #    fields[field][gid] = Value(simple_value=str(fields[field][gid]))
+            #    fields[field][gid] = Value(message_value=Message(fields=fields[field][gid]))
+            #fields[field] = Value(list_value=(ListValue(values=fields[field])))
+
+        if field == 'NoRelatedSym' and isinstance(fields[field], list):
+            fields[field] = wrap_no_related_sym(fields[field])
+
+            #for gid in range(len(fields[field])):
+            #    fields[field][gid] = Value(simple_value=str(fields[field][gid]))
+            #fields[field] = Value(list_value=(ListValue(values=fields[field])))
+            
         if isinstance(fields[field], str) or isinstance(fields[field], int) or isinstance(fields[field], float):
             fields[field] = Value(simple_value=str(fields[field]))
     return Message(
@@ -393,6 +422,37 @@ def wrap_into_no_related_sym(value_type, repeating_groups):
         #raise SystemExit
 
 
+def wrap_no_md_entery_type(repeating_groups):
+    for gid in range(len(repeating_groups)):
+        for objec in repeating_groups[gid]:
+            repeating_groups[gid][objec] = Value(simple_value=repeating_groups[gid][objec])
+        repeating_groups[gid] = Value(
+            message_value=(Message(fields=repeating_groups[gid])))
+    return Value(list_value=(ListValue(values=repeating_groups)))
+
+
+def wrap_no_related_sym(repeating_groups):
+    for gid in range(len(repeating_groups)):
+        for objec in repeating_groups[gid]:
+            if objec == "Instrument" and isinstance(repeating_groups[gid][objec], dict):
+                repeating_groups[gid] = wrap_instrument(repeating_groups[gid][objec])
+            else:
+                repeating_groups[gid][objec] = Value(simple_value=repeating_groups[gid][objec])
+                repeating_groups[gid] = Value(
+                    message_value=(Message(fields=repeating_groups[gid])))
+    return Value(list_value=(ListValue(values=repeating_groups)))
+
+
+def wrap_instrument(repeating_groups):
+    for gid in repeating_groups:
+        repeating_groups[gid] = Value(simple_value=repeating_groups[gid])
+    repeating_groups = Value(
+        message_value=Message(fields={
+            'Instrument': Value(message_value=(Message(fields=repeating_groups)))
+        }))
+    return repeating_groups
+
+
 def request_security_status(instrument, session_alias, event_id, factory):
     # SecurityStatusRequest parametes
     sec_status_request = {
@@ -410,20 +470,3 @@ def request_security_status(instrument, session_alias, event_id, factory):
             message=create_message_object(msg_type='SecurityStatusRequest',
                                              fields=sec_status_request,
                                              session_alias=session_alias)))
-
-
-def market_data_request(act, place_message_request):
-    logging.info('Sending request to act...')
-    logging.debug(str(place_message_request))
-    try:
-        act_response = act.marketdatarequest(place_message_request)
-    except Exception as e:
-        logging.error('FATAL ERROR. Unable to proceed.')
-        logging.error(str(e))
-        # raise SystemExit
-    if act_response.status.status == 0:
-        logging.info('Request submitted. Response received.')
-    else:
-        logging.error(f'Request submitted. Act rule executed incorrectly{str(act_response.status)}.')
-
-    return act_response
