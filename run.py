@@ -10,6 +10,7 @@ import yaml
 from google.protobuf.timestamp_pb2 import Timestamp
 
 from scenarios.AggressiveIOC_Traded_against_TwoOrders_partially_and_Cancelled import fix_run
+from scenarios.Market_Data_Request import fix_run as fix_run2
 from custom import support_functions as sf
 
 # IMPORT REFDATA FROM FILES
@@ -52,7 +53,7 @@ def scenario(factory, parent=None):
     # Execution of case for every instrument in refdata
     for instrument in instruments:
         case_id += 1
-        ver1_chain, ver2_chain = fix_run.aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(
+        ver1_chain, ver2_chain = fix_run2.market_data_request(
             f"Case[TC_{scenario_id}.{case_id}]: "
             f"Trader {trader1} vs trader {trader2} for instrument {instrument['SecurityID']}",
             report_id, {
