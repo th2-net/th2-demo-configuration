@@ -14,23 +14,34 @@ class Inputs:
 
     def __init__(self, input_parameters):
         self.input_parameters = input_parameters
+        self.NoMDET = self.m_d_r_mdet()
+        self.NoRS = self.m_d_r_nrs()
         self.request1 = self.m_d_r_f()
         self.request2 = self.m_d_r_t()
         self.request3 = self.m_d_r_t2()
         self.request4 = self.m_d_r_us()
+
+
+    def m_d_r_mdet(self) -> list:
+        return [
+            {'MDEntryType': '7'},
+            {'MDEntryType': '8'}
+        ]
+
+    def m_d_r_nrs(self) -> list:
+        return [
+            {'Instrument': {'Symbol': 'Instrument1'}},
+            {'Instrument': {'Symbol': 'Instrument2'}},
+            {'Instrument': {'Symbol': 'Instrument3'}}
+        ]
 
     def m_d_r_f(self) -> dict:
         return {
             'MDReqID': "34965",
             'SubscriptionRequestType': '0',
             'MarketDepth': '0',
-            'NoMDEntryTypes': '2',
-            'MDEntryType': '7',
-            'MDEntryType': '8',
-            'NoRelatedSym': '3',
-            'Symbol': 'Instrument1',
-            'Symbol': 'Instrument2',
-            'Symbol': 'Instrument3'
+            'NoMDEntryTypes': self.NoMDET,
+            'NoRelatedSym': self.NoRS
         }
 
     def m_d_r_t(self) -> dict:
@@ -39,13 +50,8 @@ class Inputs:
             'SubscriptionRequestType': '1',
             'MDUpdateType': '0',
             'MarketDepth': '1',
-            'NoMDEntryTypes': '2',
-            'MDEntryType': '7',
-            'MDEntryType': '8',
-            'NoRelatedSym': '3',
-            'Symbol': 'Instrument1',
-            'Symbol': 'Instrument2',
-            'Symbol': 'Instrument3'
+            'NoMDEntryTypes': self.NoMDET,
+            'NoRelatedSym': self.NoRS
         }
 
     def m_d_r_us(self) -> dict:
@@ -53,10 +59,8 @@ class Inputs:
             'MDReqID': "34966",
             'SubscriptionRequestType': '2',
             'MarketDepth': '0',
-            'NoMDEntryTypes': '0',
-            'MDEntryType': None,
-            'NoRelatedSym': '0',
-            'Component Block': None
+            'NoMDEntryTypes': [],
+            'NoRelatedSym': []
         }
 
     def m_d_r_t2(self) -> dict:
@@ -64,12 +68,6 @@ class Inputs:
             'MDReqID': "34975",
             'SubscriptionRequestType': '0',
             'MarketDepth': '1',
-            'NoMDEntryTypes': '2',
-            'MDEntryType': '7',
-            'MDEntryType': '8',
-            'NoRelatedSym': '3',
-            'Symbol': 'Instrument1',
-            'Symbol': 'Instrument2',
-            'Symbol': 'Instrument3'
+            'NoMDEntryTypes': self.NoMDET,
+            'NoRelatedSym': self.NoRS
         }
-
