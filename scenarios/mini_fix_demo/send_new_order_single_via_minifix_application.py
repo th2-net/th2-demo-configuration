@@ -83,7 +83,7 @@ def open_application(factory, base_message):
 
 def create_base_message(factory) -> BaseMessage:
     parent_event_id = store_event(factory, "Mini-FIX demo execution")
-    print("Event %s", parent_event_id)
+    print("Event %s" % parent_event_id)
     session_id = factory['win_act'].register(
         rhbatch_pb2.RhTargetServer(target=factory['custom']['target_server_win']))
     return BaseMessage(sessionId=session_id, parentEventId=parent_event_id)
