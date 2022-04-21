@@ -162,6 +162,25 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
             message_filters=[er_3vs2_filter, er_3vs1_filter, er_cancellation_filter],
             check_order=True))
     ###################################################################################################################
+    # ######Step8 - MarketDataRequest #################################################################################
+    # Sending message to act and waiting for response
+
+    request1_response = sf.market_data_request(
+        act=factory['act'],
+        place_message_request=PlaceMessageRequest(
+            description=f'STEP8: Sends request to get Trade data between "{input_parameters["trader1"]}"'
+                        f' and "{input_parameters["trader2"]}".',
+            connection_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
+            parent_event_id=input_parameters['case_id'],
+            message=sf.create_message_object(msg_type='MarketDataRequest',
+                                             fields=input.request,
+                                             session_alias=input_parameters['trader1_fix'])))
+    # Check if response is correct
+    if request1_response.status.status != RequestStatus.SUCCESS:
+        print("Case " + case_name + " is INTERRUPTED in " + str(
+            round(datetime.now().timestamp() - case_start_timestamp.ToSeconds())) + " sec.")
+        return input_parameters['ver1_chain'], input_parameters['ver2_chain']
+    ###################################################################################################################
     # Print case execution time
     print("Case " + case_name + " is executed in " + str(
         round(datetime.now().timestamp() - case_start_timestamp.ToSeconds())) + " sec.")

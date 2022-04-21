@@ -1,8 +1,8 @@
 {
-  "host": "",
-  "vHost": "",
-  "port": "",
-  "username": "",
-  "password": "",
-  "exchangeName": ""
+  "exchangeName": "th2-exchange",
+  "host": "th2-kuber-test04",
+  "password": "eiHo1zux",
+  "port": 32000,
+  "username": "th2",
+  "vHost": "th2-demomdr"
 }

@@ -1,14 +1,14 @@
 {
   "queues": {
-    "event-store-pin": {
+    "estore-pin": {
       "attributes": [
-        "event",
-        "publish"
+        "publish",
+        "event"
       ],
-      "exchange": "fill with rabbit exchange name",
+      "exchange": "th2-exchange",
       "filters": [],
-      "name": "fill with routing key of script to estore",
-      "queue": "not_necessary"
+      "name": "key[th2-demomdr:script-entry-point:estore-pin]",
+      "queue": ""
     }
   }
 }

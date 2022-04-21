@@ -1,29 +1,33 @@
 {
   "services": {
     "Act": {
-      "service-class": "ActService",
       "endpoints": {
         "act": {
-          "host": "0.0.0.0",
-          "port": 0
+          "host": "th2-kuber-test04",
+          "port": "31178"
         }
       },
+      "service-class": "ActService",
       "strategy": {
-        "name": "robin",
-        "endpoints": ["act"]
+        "endpoints": [
+          "act"
+        ],
+        "name": "robin"
       }
     },
     "Check1": {
-      "service-class": "Check1Service",
       "endpoints": {
         "check1": {
-          "host": "0.0.0.0",
-          "port": 0
+          "host": "th2-kuber-test04",
+          "port": "31179"
         }
       },
+      "service-class": "Check1Service",
       "strategy": {
-        "name": "robin",
-        "endpoints": ["check1"]
+        "endpoints": [
+          "check1"
+        ],
+        "name": "robin"
       }
     }
   }

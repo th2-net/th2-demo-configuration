@@ -19,6 +19,9 @@ class Inputs:
         self.order1 = self.newordersingle1()
         self.order2 = self.newordersingle2()
         self.order3 = self.newordersingle3()
+        self.NoMDET = self.m_d_r_mdet()
+        self.NoRS = self.m_d_r_nrs()
+        self.request = self.m_d_r_f()
 
     def trader1_trading_party(self) -> list:
         return [
@@ -33,6 +36,15 @@ class Inputs:
             {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
             {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
             {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
+
+    def m_d_r_mdet(self) -> list:
+        return [
+            {'MDEntryType': '2'}]
+
+    def m_d_r_nrs(self) -> list:
+        return [
+            {'Instrument': {'SecurityID': self.input_parameters['Instrument'], 'SecurityIDSource': "8"
+                , 'Symbol': 'Instrument1'}}]
 
     def newordersingle1(self) -> dict:
         return {
@@ -257,4 +269,13 @@ class Inputs:
             'TimeInForce': '3',
             'header': {**self.basic_header,
                        'TargetCompID': self.input_parameters['trader2']},
+        }
+
+    def m_d_r_f(self) -> dict:
+        return {
+            'MDReqID': sf.generate_client_order_id(7),
+            'SubscriptionRequestType': '0',
+            'MarketDepth': '0',
+            'NoMDEntryTypes': self.NoMDET,
+            'NoRelatedSym': self.NoRS
         }

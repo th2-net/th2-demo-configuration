@@ -42,12 +42,12 @@ def market_data_request(case_name,report_id, input_parameters,factory):
             round(datetime.now().timestamp() - case_start_timestamp.ToSeconds())) + " sec.")
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
     ###################################################################################################################
-    # ###### STEP2 - Market Data Request Top Book #####################################################################
+    # ###### STEP2 - Market Data Request Top Book w Updete ############################################################
     # Sending message to act and waiting for response
     request2_response = sf.market_data_request(
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
-            description=f'STEP1: Sends request to get Top Book.',
+            description=f'STEP1: Sends request to get Top Book w Update.',
             connection_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             parent_event_id=input_parameters['case_id'],
             message=sf.create_message_object(msg_type='MarketDataRequest',
@@ -61,21 +61,17 @@ def market_data_request(case_name,report_id, input_parameters,factory):
     ###################################################################################################################
     # ###### STEP3 - Data Change ######################################################################################
     # Sending message to act and waiting for response
-
-    ###################################################################################################################
-    # ###### STEP4 - Market Data Request Unsubscribe ##################################################################
-    # Sending message to act and waiting for response
-    request3_response = sf.market_data_request(
+    request2_response = sf.market_data_request(
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
-            description=f'STEP1: Sends request to Unsubscribe.',
+            description=f'STEP1: Sends request to get Top Book.',
             connection_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             parent_event_id=input_parameters['case_id'],
             message=sf.create_message_object(msg_type='MarketDataRequest',
                                              fields=input.request3,
                                              session_alias=input_parameters['trader1_fix'])))
     # Check if response is correct
-    if request3_response.status.status != RequestStatus.SUCCESS:
+    if request2_response.status.status != RequestStatus.SUCCESS:
         print("Case " + case_name + " is INTERRUPTED in " + str(
             round(datetime.now().timestamp() - case_start_timestamp.ToSeconds())) + " sec.")
         return input_parameters['ver1_chain'], input_parameters['ver2_chain']
