@@ -3,7 +3,10 @@ on:
 
 jobs:
   build:
-    runs-on: windows-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
     name: Python CI
     steps:
       - uses: actions/checkout@v3
@@ -12,4 +15,4 @@ jobs:
         with:
           python-version: pypy3.7
           architecture: x64
-      - run: pin install -r requirements.txt
+      - run: pip install -r requirements.txt
