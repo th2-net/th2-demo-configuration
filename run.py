@@ -35,7 +35,7 @@ def scenario(factory, parent=None):
     sf.submit_event(
         estore=factory['estore'],
         event_batch=sf.create_event_batch(
-            report_name=f"[TS_{scenario_id}]Aggressive IOC vs two orders: second order's price is lower than first",
+            report_name=f"[TS_{scenario_id}]Aggressive IOC vs two orders: second order's price is more favorable than first",
             start_timestamp=report_start_timestamp,
             event_id=report_id,
             parent_id=parent))

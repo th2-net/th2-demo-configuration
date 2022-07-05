@@ -69,7 +69,7 @@ def aggressive_ioc_traded_against_two_orders_partially_and_then_cancelled(case_n
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
             description=f'STEP3: Trader "{input_parameters["trader1"]}" '
-                        f'sends request to create passive Order with price lower than first order.',
+                        f'sends request to create passive Order with price higher than first order.',
             connection_id=ConnectionID(session_alias=input_parameters['trader1_fix']),
             parent_event_id=input_parameters['case_id'],
             message=sf.create_message_object(msg_type='NewOrderSingle',
