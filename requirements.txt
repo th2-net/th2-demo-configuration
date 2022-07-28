@@ -12,5 +12,5 @@
 th2-common==3.8.4
 th2-grpc-act-template==3.9.0
 th2-grpc-check1==3.6.0
-th2-data-services==1.1.0
+th2-data-services==1.0.3
 th2-data-services-utils==0.3.5
