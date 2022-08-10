@@ -1,0 +1,15 @@
+---
+trader1:
+    TraderName: DIRTY-CONN1
+    FirmName: DEMOFIRM1
+    TraderConnection: dirty-conn1
+    AccountType: 1
+    OrderCapacity: A
+    PartyID: dirty-conn1
+trader2:
+    TraderName: DIRTY-CONN2
+    FirmName: DEMOFIRM2
+    TraderConnection: dirty-conn2
+    AccountType: 1
+    OrderCapacity: A
+    PartyID: dirty-conn2

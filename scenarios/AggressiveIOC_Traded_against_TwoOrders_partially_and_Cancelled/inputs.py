@@ -1,260 +1,334 @@
 from datetime import datetime
+from typing import Any, Dict, Optional
 
 from custom import support_functions as sf
+from th2_common_utils.converters.filter_converters import FieldFilter
+from th2_grpc_act_template.act_template_typed_pb2 import NewOrderSingle, NoPartyIDs, TradingParty
+from th2_grpc_check1.check1_pb2 import ChainID
+from th2_grpc_common.common_pb2 import FilterOperation
 
 
 class Inputs:
+
     basic_header = {
         'BeginString': 'FIXT.1.1',
-        'SenderCompID': '*',
-        'SendingTime': '*',
-        'MsgSeqNum': '*',
-        'BodyLength': '*',
-        'MsgType': '8', }
+        'SenderCompID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+        'SendingTime': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+        'MsgSeqNum': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+        'BodyLength': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+        'MsgType': '8'
+    }
 
-    def __init__(self, input_parameters):
-        self.input_parameters = input_parameters
-        self.trading_party1 = self.trader1_trading_party()
-        self.trading_party2 = self.trader2_trading_party()
-        self.order1 = self.newordersingle1()
-        self.order2 = self.newordersingle2()
-        self.order3 = self.newordersingle3()
+    def __init__(self,
+                 instrument: Dict[str, str],
+                 users: Dict[str, Any],
+                 ver1_chain: Optional[ChainID],
+                 ver2_chain: Optional[ChainID]) -> None:
+        self.instrument = instrument
+        self.users = users
+        self.ver1_chain = ver1_chain
+        self.ver2_chain = ver2_chain
 
-    def trader1_trading_party(self) -> list:
-        return [
-            {'PartyID': self.input_parameters['trader1'], 'PartyIDSource': "D", 'PartyRole': "76"},
-            {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
-            {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
-            {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
+        self.order1 = self.new_order_single1()
+        self.order2 = self.new_order_single2()
+        self.order3 = self.new_order_single3()
 
-    def trader2_trading_party(self) -> list:
-        return [
-            {'PartyID': self.input_parameters['trader2'], 'PartyIDSource': "D", 'PartyRole': "76"},
-            {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "3"},
-            {'PartyID': "0", 'PartyIDSource': "P", 'PartyRole': "122"},
-            {'PartyID': "3", 'PartyIDSource': "P", 'PartyRole': "12"}]
-
-    def newordersingle1(self) -> dict:
+    def trader1_trading_party(self) -> dict:
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'OrderQty': self.input_parameters['Order1Qty'],
-            'Price': self.input_parameters['Order1Price'],
-            'ClOrdID': sf.generate_client_order_id(7),
-            'SecondaryClOrdID': '11111',
-            'Side': "1",
-            'TimeInForce': '0',
-            'TransactTime': (datetime.now().isoformat()),
-            'TradingParty': self.trading_party1
+            'NoPartyIDs': [
+                {'PartyID': self.users['trader1']['TraderName'], 'PartyIDSource': 'D', 'PartyRole': '76'},
+                {'PartyID': '0', 'PartyIDSource': 'P', 'PartyRole': '3'},
+                {'PartyID': '0', 'PartyIDSource': 'P', 'PartyRole': '122'},
+                {'PartyID': '3', 'PartyIDSource': 'P', 'PartyRole': '12'}
+            ]
         }
 
-    def newordersingle2(self) -> dict:
+    def trader2_trading_party(self) -> dict:
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'TimeInForce': '0',
-            'OrderQty': self.input_parameters['Order2Qty'],
-            'Price': self.input_parameters['Order2Price'],
-            'ClOrdID': sf.generate_client_order_id(7),
-            'SecondaryClOrdID': '22222',
-            'Side': "1",
-            'TransactTime': (datetime.now().isoformat()),
-            'TradingParty': self.trading_party1
+            'NoPartyIDs': [
+                {'PartyID': self.users['trader2']['TraderName'], 'PartyIDSource': 'D', 'PartyRole': '76'},
+                {'PartyID': '0', 'PartyIDSource': 'P', 'PartyRole': '3'},
+                {'PartyID': '0', 'PartyIDSource': 'P', 'PartyRole': '122'},
+                {'PartyID': '3', 'PartyIDSource': 'P', 'PartyRole': '12'}
+            ]
         }
 
-    def newordersingle3(self) -> dict:
-        return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'OrderQty': self.input_parameters['Order3Qty'],
-            'Price': self.input_parameters['Order3Price'],
-            'ClOrdID': sf.generate_client_order_id(7),
-            'SecondaryClOrdID': '33333',
-            'Side': "2",
-            'TimeInForce': '3',
-            'TransactTime': (datetime.now().isoformat()),
-            'TradingParty': self.trading_party2,
-        }
+    def new_order_single1(self) -> NewOrderSingle:
+        return self._create_new_order_single(order_qty=30,
+                                             side='1',
+                                             user_id='trader1',
+                                             ord_type='2',
+                                             secondary_cl_ord_id='11111')
+
+    def new_order_single2(self) -> NewOrderSingle:
+        return self._create_new_order_single(order_qty=10,
+                                             side='1',
+                                             user_id='trader1',
+                                             ord_type='2',
+                                             secondary_cl_ord_id='22222')
+
+    def new_order_single3(self) -> NewOrderSingle:
+        return self._create_new_order_single(order_qty=100,
+                                             side='2',
+                                             user_id='trader2',
+                                             ord_type='2',
+                                             secondary_cl_ord_id='33333',
+                                             time_in_force='3')
 
     def execution1(self) -> dict:
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order1['ClOrdID'],
-            'LeavesQty': self.order1['OrderQty'],
-            'Side': self.order1['Side'],
-            'Price': self.order1['Price'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order1.cl_ord_id, key=True),
+            'LeavesQty': int(self.order1.order_qty),
+            'Side': self.order1.side,
+            'Price': int(self.order1.price),
             'CumQty': '0',
             'ExecType': '0',
-            'OrdStatus': '0',
-            'TradingParty': self.trading_party1,
-            'ExecID': '*',
-            'OrderQty': self.order1['OrderQty'],
-            'OrderID': '*',
-            'Text': '*',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader1']},
+            'OrdStatus': FieldFilter('0', key=True),
+            'TradingParty': self.trader1_trading_party(),
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'OrderQty': int(self.order1.order_qty),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'header': {
+                **self.basic_header,
+                       'TargetCompID': self.users['trader1']['TraderName']
+            },
         }
 
     def execution2(self) -> dict:
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order2['ClOrdID'],
-            'LeavesQty': self.order2['OrderQty'],
-            'Side': self.order2['Side'],
-            'Price': self.order2['Price'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order2.cl_ord_id, key=True),
+            'LeavesQty': int(self.order2.order_qty),
+            'Side': self.order2.side,
+            'Price': int(self.order2.price),
             'CumQty': '0',
             'ExecType': '0',
-            'OrdStatus': '0',
-            'TradingParty': self.trading_party1,
-            'ExecID': '*',
-            'OrderQty': self.order2['OrderQty'],
-            'OrderID': '*',
-            'Text': '*',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader1']},
+            'OrdStatus': FieldFilter('0', key=True),
+            'TradingParty': self.trader1_trading_party(),
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'OrderQty': int(self.order2.order_qty),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'header': {
+                **self.basic_header,
+                'TargetCompID': self.users['trader1']['TraderName']
+            },
         }
 
     def execution2vs3(self) -> dict:
+        trading_party = self.trader1_trading_party()
+        trading_party['NoPartyIDs'] += [
+            {
+                'PartyID': self.users['trader2']['FirmName'],
+                'PartyIDSource': 'D',
+                'PartyRole': '17'
+            }
+        ]
+
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order2['ClOrdID'],
-            'LeavesQty': '0',
-            'Side': self.order2['Side'],
-            'CumQty': self.order2['OrderQty'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order2.cl_ord_id, key=True),
+            'LeavesQty': FieldFilter('0', key=True),
+            'Side': self.order2.side,
+            'CumQty': FieldFilter(int(self.order2.order_qty), key=True),
             'ExecType': 'F',
-            'OrdStatus': '2',
-            'TradingParty': (self.trading_party1 + [
-                {'PartyID': self.input_parameters['trader2_firm'], 'PartyIDSource': "D", 'PartyRole': "17"}
-            ]),
-            'ExecID': '*',
-            'LastPx': self.order2['Price'],
-            'Price': self.order2['Price'],
-            'OrderQty': self.order2['OrderQty'],
-            'OrderID': '*',
-            'Text': '*',
+            'OrdStatus': FieldFilter('2', key=True),
+            'TradingParty': trading_party,
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'LastPx': int(self.order2.price),
+            'Price': int(self.order2.price),
+            'OrderQty': int(self.order2.order_qty),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
             'TimeInForce': '0',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader1']},
+            'header': {
+                **self.basic_header,
+                'TargetCompID': self.users['trader1']['TraderName']
+            },
         }
 
-    def execution1vs3(self):
+    def execution1vs3(self) -> dict:
+        trading_party = self.trader1_trading_party()
+        trading_party['NoPartyIDs'] += [
+            {
+                'PartyID': self.users['trader2']['FirmName'],
+                'PartyIDSource': 'D',
+                'PartyRole': '17'
+            }
+        ]
+
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order1['ClOrdID'],
-            'LeavesQty': '0',
-            'Side': self.order1['Side'],
-            'CumQty': self.order1['OrderQty'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order1.cl_ord_id, key=True),
+            'LeavesQty': FieldFilter('0', key=True),
+            'Side': self.order1.side,
+            'CumQty': FieldFilter(int(self.order1.order_qty), key=True),
             'ExecType': 'F',
-            'OrdStatus': '2',
-            'TradingParty': self.trading_party1 + [
-                {'PartyID': self.input_parameters['trader2_firm'], 'PartyIDSource': "D", 'PartyRole': "17"}],
-            'ExecID': '*',
-            'LastPx': self.order1['Price'],
-            'Price': self.order1['Price'],
-            'OrderQty': self.order1['OrderQty'],
-            'OrderID': '*',
-            'Text': '*',
+            'OrdStatus': FieldFilter('2', key=True),
+            'TradingParty': trading_party,
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'LastPx': int(self.order1.price),
+            'Price': int(self.order1.price),
+            'OrderQty': int(self.order1.order_qty),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
             'TimeInForce': '0',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader1']
-                       }
+            'header': {
+                **self.basic_header,
+                'TargetCompID': self.users['trader1']['TraderName']
+            }
         }
 
-    def execution3vs2(self):
+    def execution3vs2(self) -> dict:
+        trading_party = self.trader2_trading_party()
+        trading_party['NoPartyIDs'] += [
+            {
+                'PartyID': self.users['trader1']['FirmName'],
+                'PartyIDSource': 'D',
+                'PartyRole': '17'
+            }
+        ]
+
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order3['ClOrdID'],
-            'OrderQty': self.order3['OrderQty'],
-            'LeavesQty': self.order3['OrderQty'] - self.order2['OrderQty'],
-            'Side': self.order3['Side'],
-            'CumQty': self.order2['OrderQty'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order3.cl_ord_id, key=True),
+            'OrderQty': int(self.order3.order_qty),
+            'LeavesQty': FieldFilter(int(self.order3.order_qty - self.order2.order_qty), key=True),
+            'Side': self.order3.side,
+            'CumQty': FieldFilter(int(self.order2.order_qty), key=True),
             'ExecType': 'F',
-            'OrdStatus': '1',
-            'TradingParty': self.trading_party2 + [
-                {'PartyID': self.input_parameters['trader1_firm'], 'PartyIDSource': "D", 'PartyRole': "17"}],
-            'ExecID': '*',
-            'Price': self.order3['Price'],
-            'OrderID': '*',
-            'Text': '*',
+            'OrdStatus': FieldFilter('1', key=True),
+            'TradingParty': trading_party,
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Price': int(self.order3.price),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
             'TimeInForce': '3',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader2']},
+            'header': {
+                **self.basic_header,
+                'TargetCompID': self.users['trader2']['TraderName']
+            },
         }
 
-    def execution3vs1(self):
+    def execution3vs1(self) -> dict:
+        trading_party = self.trader2_trading_party()
+        trading_party['NoPartyIDs'] += [
+            {
+                'PartyID': self.users['trader1']['FirmName'],
+                'PartyIDSource': 'D',
+                'PartyRole': '17'
+            }
+        ]
+
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order3['ClOrdID'],
-            'OrderQty': self.order3['OrderQty'],
-            'LeavesQty': self.order3['OrderQty'] - self.order2['OrderQty'] - self.order1['OrderQty'],
-            'Side': self.order3['Side'],
-            'CumQty': self.order2['OrderQty'] + self.order1['OrderQty'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order3.cl_ord_id, key=True),
+            'OrderQty': int(self.order3.order_qty),
+            'LeavesQty': FieldFilter(int(self.order3.order_qty - self.order2.order_qty - self.order1.order_qty),
+                                     key=True),
+            'Side': self.order3.side,
+            'CumQty': FieldFilter(int(self.order2.order_qty + self.order1.order_qty), key=True),
             'ExecType': 'F',
-            'OrdStatus': '1',
-            'TradingParty': self.trading_party2 + [
-                {'PartyID': self.input_parameters['trader1_firm'], 'PartyIDSource': "D", 'PartyRole': "17"}],
-            'ExecID': '*',
-            'Price': self.order3['Price'],
-            'OrderID': '*',
-            'Text': '*',
+            'OrdStatus': FieldFilter('1', key=True),
+            'TradingParty': trading_party,
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Price': int(self.order3.price),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
             'TimeInForce': '3',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader2']},
+            'header': {
+                **self.basic_header,
+                'TargetCompID': self.users['trader2']['TraderName']
+            },
         }
 
-    def execution3(self):
+    def execution3(self) -> dict:
         return {
-            'SecurityID': self.input_parameters['Instrument'],
-            'SecurityIDSource': "8",
-            'OrdType': "2",
-            'AccountType': "1",
-            'OrderCapacity': "A",
-            'ClOrdID': self.order3['ClOrdID'],
-            'OrderQty': self.order3['OrderQty'],
-            'LeavesQty': '0',
-            'Side': self.order3['Side'],
-            'CumQty': self.order2['OrderQty'] + self.order1['OrderQty'],
+            'SecurityID': self.instrument['Name'],
+            'SecurityIDSource': '8',
+            'OrdType': '2',
+            'AccountType': '1',
+            'OrderCapacity': 'A',
+            'ClOrdID': FieldFilter(self.order3.cl_ord_id, key=True),
+            'OrderQty': int(self.order3.order_qty),
+            'LeavesQty': FieldFilter('0', key=True),
+            'Side': self.order3.side,
+            'CumQty': FieldFilter(int(self.order2.order_qty + self.order1.order_qty), key=True),
             'ExecType': 'C',
-            'OrdStatus': 'C',
-            'TradingParty': self.trading_party2,
-            'ExecID': '*',
-            'Price': self.order3['Price'],
-            'OrderID': '*',
-            'Text': '*',
+            'OrdStatus': FieldFilter('C', key=True),
+            'TradingParty': self.trader2_trading_party(),
+            'ExecID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Price': int(self.order3.price),
+            'OrderID': FieldFilter(operation=FilterOperation.NOT_EMPTY),
+            'Text': FieldFilter(operation=FilterOperation.NOT_EMPTY),
             'TimeInForce': '3',
-            'header': {**self.basic_header,
-                       'TargetCompID': self.input_parameters['trader2']},
+            'header': {
+                **self.basic_header,
+                'TargetCompID': self.users['trader2']['TraderName']
+            },
         }
+
+    def _create_new_order_single(self,
+                                 order_qty: float,
+                                 side: str,
+                                 user_id: str,
+                                 ord_type: str,
+                                 secondary_cl_ord_id: str,
+                                 time_in_force: str = '0') -> NewOrderSingle:
+        return NewOrderSingle(security_id=self.instrument['Name'],
+                              security_id_source=str(self.instrument['SecurityIDSource']),
+                              ord_type=ord_type,
+                              account_type=self.users[user_id]['AccountType'],
+                              order_capacity=self.users[user_id]['OrderCapacity'],
+                              order_qty=order_qty,
+                              price=int(self.instrument['Price']),
+                              cl_ord_id=sf.create_client_order_id(6),
+                              secondary_cl_ord_id=secondary_cl_ord_id,
+                              side=side,
+                              time_in_force=time_in_force,
+                              transact_time=datetime.now().isoformat(),
+                              trading_party=self._create_trading_party(user_id))
+
+    def _create_trading_party(self, user_id: str) -> TradingParty:
+        return TradingParty(
+            no_party_ids=[
+                NoPartyIDs(party_id=self.users[user_id]['TraderName'],
+                           party_id_source='D',
+                           party_role=76),
+                NoPartyIDs(party_id='0',
+                           party_id_source='P',
+                           party_role=3),
+                NoPartyIDs(party_id='0',
+                           party_id_source='P',
+                           party_role=122),
+                NoPartyIDs(party_id='3',
+                           party_id_source='P',
+                           party_role=12)
+            ]
+        )

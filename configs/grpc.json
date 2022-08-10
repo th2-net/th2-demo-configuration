@@ -1,7 +1,7 @@
 {
   "services": {
-    "Act": {
-      "service-class": "ActService",
+    "ActTyped": {
+      "service-class": "ActTypedService",
       "endpoints": {
         "act": {
           "host": "0.0.0.0",
