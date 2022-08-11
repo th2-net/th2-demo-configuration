@@ -11,7 +11,7 @@ from th2_grpc_common.common_pb2 import EventID
 def scenario(connection: Connection, scenario_id: int, parent: Optional[EventID] = None) -> None:
     # Creation of the root Event for all cases performed.
     scenario_name = f'[TS_{scenario_id}]Aggressive IOC vs two orders: ' \
-                    f'second order"s price is more favorable than first'
+                    f'second order\'s price is more favorable than first'
     scenario_event_id = connection.create_and_send_event(event_name=scenario_name,
                                                          parent_id=parent)
 

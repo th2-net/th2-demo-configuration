@@ -150,7 +150,7 @@ def create_chain_id() -> ChainID:
 
 
 def create_client_order_id(length: int) -> str:
-    return str(random.randint(10 ** length, (10 ** length + 1) - 1))
+    return str(random.randint(10 ** length, (10 ** (length + 1)) - 1))
 
 
 def read_configuration(path: Path) -> dict:
