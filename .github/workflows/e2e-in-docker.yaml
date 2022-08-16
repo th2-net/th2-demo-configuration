@@ -21,10 +21,15 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+          architecture: x64
+
       - name: Run demo script
         timeout-minutes: 5
         run: |
-          export PYTHONUNBUFFERED=TRUE
           until nc -vz localhost 32600
           do
             echo "Waiting for rabbitmq service"
