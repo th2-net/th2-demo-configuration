@@ -21,7 +21,6 @@ jobs:
           done
       - name: Install dependencies
         run: |
-          cd ..
           sudo apt-get install -y libhdf5-dev
           python -m pip install --upgrade pip
           pip install -r requirements.txt
