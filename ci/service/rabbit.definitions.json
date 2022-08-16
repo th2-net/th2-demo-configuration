@@ -1,0 +1,891 @@
+{
+  "rabbit_version": "3.9.11",
+  "rabbitmq_version": "3.9.11",
+  "product_name": "RabbitMQ",
+  "product_version": "3.9.11",
+  "users": [
+    {
+      "name": "th2",
+      "password_hash": "mR2xbLRAnwwszhXH9ywvLrV0G5+4F2a1o7z4SaItTGLPoPIC",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [
+        "administrator"
+      ],
+      "limits": {}
+    },
+    {
+      "name": "th2-user-demo",
+      "password_hash": "7fmFWm1++sdblTQH7uRvYcHhbzGRlQ8qp/ByRtVC1CYlOjy3",
+      "hashing_algorithm": "rabbit_password_hashing_sha256",
+      "tags": [],
+      "limits": {}
+    }
+  ],
+  "vhosts": [
+    {
+      "name": "th2-demo"
+    },
+    {
+      "name": "th2"
+    }
+  ],
+  "permissions": [
+    {
+      "user": "th2-user-demo",
+      "vhost": "th2-demo",
+      "configure": "",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "th2",
+      "vhost": "th2-demo",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    },
+    {
+      "user": "th2",
+      "vhost": "th2",
+      "configure": ".*",
+      "write": ".*",
+      "read": ".*"
+    }
+  ],
+  "topic_permissions": [],
+  "parameters": [],
+  "global_parameters": [
+    {
+      "name": "internal_cluster_id",
+      "value": "rabbitmq-cluster-id-FxxkBQrK-M2mpMszBvwADg"
+    }
+  ],
+  "policies": [],
+  "queues": [
+    {
+      "name": "link[th2-demo:codec-fix:in_codec_general_decode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:sim-demo:subscribe]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-max-length": 1000,
+        "x-overflow": "drop-head"
+      }
+    },
+    {
+      "name": "link[th2-demo:check1:from_codec]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:recon:incoming]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-csv:in_codec_general_decode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-sim-fix:in_codec_general_encode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-sim-fix:in_codec_encode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:dc-demo-server1:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:mstore:mstore-pin-raw]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:demo-conn1:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:estore:estore-pin]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-sim-fix:in_codec_general_decode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:dc-demo-server2:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:act-fix:from_codec]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:demo-dc2:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-sim-fix:in_codec_decode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:cradle-viewer-entry-point:from_codec]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {
+        "x-max-length": 1000,
+        "x-overflow": "drop-head"
+      }
+    },
+    {
+      "name": "link[th2-demo:codec-fix:in_codec_decode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:rpt-data-provider:from_codec]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-fix:in_codec_encode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:mstore:mstore-pin-parsed]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-fix:in_codec_general_encode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:fix-demo-server1:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:demo-conn2:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:codec-csv:in_codec_decode]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:fix-demo-server2:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    },
+    {
+      "name": "link[th2-demo:demo-dc1:fix_to_send]",
+      "vhost": "th2-demo",
+      "durable": true,
+      "auto_delete": false,
+      "arguments": {}
+    }
+  ],
+  "exchanges": [
+    {
+      "name": "th2-exchange",
+      "vhost": "th2-demo",
+      "type": "direct",
+      "durable": true,
+      "auto_delete": false,
+      "internal": false,
+      "arguments": {}
+    }
+  ],
+  "bindings": [
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:act-fix:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_encode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:act-fix:to_send]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:act-ui-backend:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_encode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:act-ui-backend:to-fix-codec]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:act-ui:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:check1:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-csv:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:recon:incoming]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-csv:out_codec_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:rpt-data-provider:from_codec]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-csv:out_codec_general_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:act-fix:from_codec]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:check1:from_codec]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:cradle-viewer-entry-point:from_codec]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:recon:incoming]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:demo-conn1:fix_to_send]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_encode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:demo-conn2:fix_to_send]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_encode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:rpt-data-provider:from_codec]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-fix:out_codec_general_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-sim-fix:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:sim-demo:subscribe]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-sim-fix:out_codec_decode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:dc-demo-server1:fix_to_send]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-sim-fix:out_codec_encode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:dc-demo-server2:fix_to_send]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-sim-fix:out_codec_encode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:fix-demo-server1:fix_to_send]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-sim-fix:out_codec_encode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:fix-demo-server2:fix_to_send]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:codec-sim-fix:out_codec_encode]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:cradle-viewer-entry-point:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:cradle-viewer-entry-point:to_codec]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:dc-demo-server1:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:dc-demo-server1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:dc-demo-server1:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:dc-demo-server2:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:dc-demo-server2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:dc-demo-server2:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn1:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn1:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn1:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn2:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn2:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-conn2:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc1:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc1:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc1:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc2:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc2:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:demo-dc2:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server1:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-sim-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server1:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server1:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server2:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-sim-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server2:in_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:fix-demo-server2:out_raw]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:read-csv:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-csv:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:read-csv:out_log]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:read-csv:out_log]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:read-log:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:read-log:read_log_demo_out]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:mstore:mstore-pin-raw]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:read-log:read_log_demo_out]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:recon:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:rpt-data-provider:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-csv:in_codec_general_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:rpt-data-provider:to_codec_csv]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-fix:in_codec_general_decode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:rpt-data-provider:to_codec_fix]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:rpt-data-viewer:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:script-entry-point:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:sim-demo:estore-pin]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-sim-fix:in_codec_encode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:sim-demo:send1]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-sim-fix:in_codec_encode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:sim-demo:send2]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-sim-fix:in_codec_encode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:sim-demo:send3]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:codec-sim-fix:in_codec_encode]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:sim-demo:send4]",
+      "arguments": {}
+    },
+    {
+      "source": "th2-exchange",
+      "vhost": "th2-demo",
+      "destination": "link[th2-demo:estore:estore-pin]",
+      "destination_type": "queue",
+      "routing_key": "key[th2-demo:util:estore-pin]",
+      "arguments": {}
+    }
+  ]
+}
+

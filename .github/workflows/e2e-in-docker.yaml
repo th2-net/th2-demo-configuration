@@ -1,0 +1,44 @@
+on:
+  push
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    name: e2e CI
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy
+        run: |
+          docker swarm init
+          docker network create --driver overlay --scope swarm infra
+          cd ./ci
+          docker stack deploy -c infra.yaml infra
+          docker stack deploy -c th2-demo.yaml th2-demo
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.8"
+          architecture: x64
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get install -y libhdf5-dev
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run demo script
+        timeout-minutes: 5
+        run: |
+          export PYTHONUNBUFFERED=TRUE
+          until nc -vz localhost 32600
+          do
+            echo "Waiting for rabbitmq service"
+            sleep 5
+          done
+          until nc -vz localhost 31179
+          do
+            echo "Waiting for check1 service"
+            sleep 5
+          done
+          python run.py

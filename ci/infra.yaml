@@ -1,0 +1,73 @@
+version: "3.8"
+networks:
+  infra:
+    external: true
+    ipam: {}
+services:
+  cassandra:
+    deploy:
+      placement: {}
+      resources: {}
+      restart_policy:
+        condition: any
+    env_file:
+    - service/.env
+    environment:
+      CASSANDRA_DATACENTER: dc1
+      CASSANDRA_PASSWORD_SEEDER: "yes"
+      JVM_EXTRA_OPTS: "-Dcassandra.skip_wait_for_gossip_to_settle=0"
+    hostname: cassandra.service.svc.cluster.local
+    image: docker.io/bitnami/cassandra:3.11
+    logging:
+      driver: json-file
+      options:
+        tag: cassandra
+    networks:
+      infra: null
+  ingress:
+    deploy:
+      placement: {}
+      resources: {}
+      restart_policy:
+        condition: any
+    image: nginx
+    logging:
+      driver: json-file
+      options:
+        tag: ingress
+    networks:
+      infra: null
+    ports:
+    - published: 10000
+      target: 8080
+    volumes:
+    - source: ./service/nginx.conf
+      target: /etc/nginx/nginx.conf
+      type: bind
+  rabbitmq:
+    deploy:
+      placement: {}
+      resources: {}
+      restart_policy:
+        condition: any
+    env_file:
+    - service/.env
+    environment:
+      RABBITMQ_DISK_FREE_ABSOLUTE_LIMIT: 1G
+      RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS: -rabbitmq_management load_definitions "/tmp/rabbit.definitions.json"
+      RABBITMQ_USERNAME: th2
+      RABBITMQ_VM_MEMORY_HIGH_WATERMARK: 2G
+    hostname: rabbitmq.service.svc.cluster.local
+    image: docker.io/bitnami/rabbitmq:3.9
+    logging:
+      driver: json-file
+      options:
+        tag: rabbitmq
+    ports:
+      - 32600:5672
+    networks:
+      infra: null
+    volumes:
+    - source: ./service/rabbit.definitions.json
+      target: /tmp/rabbit.definitions.json
+      type: bind

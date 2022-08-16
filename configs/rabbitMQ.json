@@ -1,8 +1,8 @@
 {
-  "host": "",
-  "vHost": "",
-  "port": "",
-  "username": "",
-  "password": "",
-  "exchangeName": ""
+  "host": "localhost",
+  "port": "32600",
+  "vHost": "th2-demo",
+  "username": "th2",
+  "password": "rab-pass",
+  "exchangeName": "th2-exchange"
 }
