@@ -14,17 +14,24 @@ jobs:
           cd ./ci
           docker stack deploy -c infra.yaml infra
           docker stack deploy -c th2-demo.yaml th2-demo
-          until nc -vz localhost 32600
-          do
-            echo "Waiting for rabbitmq service"
-            sleep 5
-          done
+
       - name: Install dependencies
         run: |
           sudo apt-get install -y libhdf5-dev
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+
       - name: Run demo script
         timeout-minutes: 1
         run: |
+          until nc -vz localhost 32600
+          do
+            echo "Waiting for rabbitmq service"
+            sleep 5
+          done
+          until nc -vz localhost 31179
+          do
+            echo "Waiting for check1 service"
+            sleep 5
+          done
           python run.py
