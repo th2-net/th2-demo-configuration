@@ -24,6 +24,7 @@ jobs:
       - name: Run demo script
         timeout-minutes: 5
         run: |
+          export PYTHONUNBUFFERED=TRUE
           until nc -vz localhost 32600
           do
             echo "Waiting for rabbitmq service"
