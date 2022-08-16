@@ -1,0 +1,73 @@
+{
+    "queues": {
+        "estore-pin": {
+            "attributes": [
+                "event",
+                "publish"
+            ],
+            "exchange": "th2-exchange",
+            "filters": [],
+            "name": "key[th2-demo:sim-demo:estore-pin]",
+            "queue": ""
+        },
+        "send1": {
+            "attributes": [
+                "publish",
+                "fix-demo-server1",
+                "parsed",
+                "second"
+            ],
+            "exchange": "th2-exchange",
+            "filters": [],
+            "name": "key[th2-demo:sim-demo:send1]",
+            "queue": ""
+        },
+        "send2": {
+            "attributes": [
+                "publish",
+                "fix-demo-server2",
+                "parsed",
+                "second"
+            ],
+            "exchange": "th2-exchange",
+            "filters": [],
+            "name": "key[th2-demo:sim-demo:send2]",
+            "queue": ""
+        },
+        "send3": {
+            "attributes": [
+                "publish",
+                "dc-demo-server1",
+                "parsed",
+                "second"
+            ],
+            "exchange": "th2-exchange",
+            "filters": [],
+            "name": "key[th2-demo:sim-demo:send3]",
+            "queue": ""
+        },
+        "send4": {
+            "attributes": [
+                "publish",
+                "dc-demo-server2",
+                "parsed",
+                "second"
+            ],
+            "exchange": "th2-exchange",
+            "filters": [],
+            "name": "key[th2-demo:sim-demo:send4]",
+            "queue": ""
+        },
+        "subscribe": {
+            "attributes": [
+                "subscribe",
+                "parsed",
+                "first"
+            ],
+            "exchange": "th2-exchange",
+            "filters": [],
+            "name": "",
+            "queue": "link[th2-demo:sim-demo:subscribe]"
+        }
+    }
+}

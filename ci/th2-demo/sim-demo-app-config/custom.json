@@ -1,0 +1,34 @@
+{
+    "defaultRules": [
+        {
+            "enable": "true",
+            "methodName": "createDemoRule",
+            "settings": {
+                "connection_id": {
+                    "session_alias": "fix-demo-server1"
+                },
+                "fields": null
+            }
+        },
+        {
+            "enable": "true",
+            "methodName": "createDemoRule",
+            "settings": {
+                "connection_id": {
+                    "session_alias": "fix-demo-server2"
+                },
+                "fields": null
+            }
+        },
+        {
+            "enable": "true",
+            "methodName": "createRuleFixSecurity",
+            "settings": {
+                "connection_id": {
+                    "session_alias": "fix-demo-server1"
+                },
+                "fields": null
+            }
+        }
+    ]
+}
