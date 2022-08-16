@@ -106,7 +106,7 @@ def placeOrderFIX(act, place_message_request):
     if act_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
-        logging.error(f'Request submitted. Act rule executed incorrectly{str(act_response.status)}.')
+        logging.error(f'Request submitted. Act rule executed incorrectly {str(act_response.status)}.')
 
     return act_response
 
