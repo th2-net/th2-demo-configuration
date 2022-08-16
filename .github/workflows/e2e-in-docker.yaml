@@ -19,3 +19,13 @@ jobs:
             echo "Waiting for rabbitmq service"
             sleep 5
           done
+      - name: Install dependencies
+        run: |
+          cd ..
+          sudo apt-get install -y libhdf5-dev
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+      - name: Run demo script
+        timeout-minutes: 1
+        run: |
+          python run.py
