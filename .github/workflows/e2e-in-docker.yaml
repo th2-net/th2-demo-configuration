@@ -3,6 +3,7 @@ on:
 
 jobs:
   deploy:
+    runs-on: ubuntu-latest
     name: Python CI
     steps:
       - uses: actions/checkout@v3
