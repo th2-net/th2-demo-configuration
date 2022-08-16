@@ -22,7 +22,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run demo script
-        timeout-minutes: 1
+        timeout-minutes: 5
         run: |
           until nc -vz localhost 32600
           do
