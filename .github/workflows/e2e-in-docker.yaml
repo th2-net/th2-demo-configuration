@@ -14,3 +14,8 @@ jobs:
           cd ./ci
           docker stack deploy -c infra.yaml infra
           docker stack deploy -c th2-demo.yaml th2-demo
+          until nc -vz rabbitmq 32600
+          do
+            echo "Waiting for rabbitmq service"
+            sleep 5
+          done
