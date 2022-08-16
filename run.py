@@ -90,18 +90,19 @@ if __name__ == '__main__':
         print(F"start datetime: {start_datetime}")
         print(F"finish datetime: {finish_datetime}")
 
-        print(F"Data Services - start")
-        with open('scenarios/data_services/start_datetime.pickle', 'wb') as f:
-            pickle.dump(start_datetime, f)
-        with open('scenarios/data_services/finish_datetime.pickle', 'wb') as f:
-            pickle.dump(finish_datetime, f)
-
-        with subprocess.Popen('jupyter notebook scenarios/data_services/notebook.ipynb'.split()) as p:
-            x = None
-            time.sleep(10)
-            while x not in ['Y', 'y']:
-                x = input("Enter Y/y to close DataServices and finish demo script: ")
-            p.kill()
+        # print(F"Data Services - start")
+        # with open('scenarios/data_services/start_datetime.pickle', 'wb') as f:
+        #     pickle.dump(start_datetime, f)
+        # with open('scenarios/data_services/finish_datetime.pickle', 'wb') as f:
+        #     pickle.dump(finish_datetime, f)
+        #
+        # with subprocess.Popen('./venv/bin/jupyter notebook scenarios/data_services/notebook.ipynb'.split()) as p:
+        #     x = None
+        #     time.sleep(10)
+        #     while x not in ['Y', 'y']:
+        #         x = input("Enter Y/y to close DataServices and finish demo script: ")
+        #     p.kill()
 
     finally:
+        print(F"Closing..")
         factory['factory'].close()
