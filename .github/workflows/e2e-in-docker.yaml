@@ -4,16 +4,13 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-    name: Python CI
+    name: e2e CI
     steps:
       - uses: actions/checkout@v3
       - name: Deploy
         run: |
           docker swarm init
           docker network create --driver overlay --scope swarm infra
-
-      - name: Deploy stack 
-        run: |
           cd ./ci
           docker stack deploy -c infra.yaml infra
           docker stack deploy -c th2-demo.yaml th2-demo
