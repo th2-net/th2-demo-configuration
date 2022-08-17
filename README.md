@@ -14,7 +14,7 @@ The th2-script is a code, which contains a set of requests to the th2 components
 ## How to start:
 **Schema(th2 environment) needed:** https://github.com/th2-net/th2-infra-schema-demo/tree/ver-1.6.1-main_scenario
 
-Python 3.7+ environment required.
+Python 3.7-3.9 environment required. (Data services lib don't support 3.10 yet)
 1. Change **configs** based on your **RabbitMQ** , **act** and **check1**
     1. Fill **grpc.json** in a folder **config** with the host, and the port of your **act** and **check1** pods. You can found it in Kubernetes Dashboard in Services tab or execute in kubectl - kubectl get services
     1. Fill **mq.json** in a folder **config** with **RabbitMQ exchange** and **routing key** from **script** to **estore**. You can find this queue in Kubernetes Dashboard in Config Maps tab - script-entry-point-app-config. 
