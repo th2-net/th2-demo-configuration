@@ -82,10 +82,10 @@ if __name__ == '__main__':
     factory = sf.connect(config_path="./configs/")
 
     try:
-        start_datetime = datetime.datetime.now()
+        start_datetime = datetime.datetime.utcnow()
         scenario(factory)
         time.sleep(10)
-        finish_datetime = datetime.datetime.now()
+        finish_datetime = datetime.datetime.utcnow()
 
         print(F"start datetime: {start_datetime}")
         print(F"finish datetime: {finish_datetime}")
