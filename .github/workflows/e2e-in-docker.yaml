@@ -3,8 +3,10 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
     name: e2e CI
+    runs-on: ubuntu-latest
+    env:
+      PYTHONUNBUFFERED: 1
     steps:
       - uses: actions/checkout@v3
       - name: Deploy
@@ -30,7 +32,6 @@ jobs:
       - name: Run demo script
         timeout-minutes: 5
         run: |
-          export PYTHONUNBUFFERED=1
           until nc -vz localhost 32600
           do
             echo "Waiting for rabbitmq service"
