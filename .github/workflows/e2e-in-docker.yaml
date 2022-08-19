@@ -42,4 +42,4 @@ jobs:
             echo "Waiting for check1 service"
             sleep 5
           done
-          python run.py
+          python run.py | tee run.log
