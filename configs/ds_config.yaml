@@ -1,1 +1,1 @@
-provider_data_source: "http://localhost:30789"
+provider_data_source: "http://127.0.0.1:30789"
