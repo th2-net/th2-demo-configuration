@@ -4,7 +4,7 @@
       "service-class": "ActService",
       "endpoints": {
         "act": {
-          "host": "localhost",
+          "host": "127.0.0.1",
           "port": 31178
         }
       },
@@ -17,7 +17,7 @@
       "service-class": "Check1Service",
       "endpoints": {
         "check1": {
-          "host": "localhost",
+          "host": "127.0.0.1",
           "port": 31179
         }
       },
