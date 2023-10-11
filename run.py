@@ -7,7 +7,6 @@ import subprocess
 import time
 
 import yaml
-from google.protobuf.timestamp_pb2 import Timestamp
 
 from scenarios.AggressiveIOC_Traded_against_TwoOrders_partially_and_Cancelled import fix_run
 from custom import support_functions as sf
@@ -21,11 +20,7 @@ with open('configs/firms.refdata') as f:
 
 def scenario(factory, parent=None):
     # Storing EventID object of root Event.
-    report_id = sf.create_event_id()
-
-    # Storing grpc Timestamp of script start.
-    report_start_timestamp = Timestamp()
-    report_start_timestamp.GetCurrentTime()
+    report_id = sf.create_event_id(factory)
 
     # Initialize chain_id for script
     ver1_chain = None
@@ -36,7 +31,6 @@ def scenario(factory, parent=None):
         estore=factory['estore'],
         event_batch=sf.create_event_batch(
             report_name=f"[TS_{scenario_id}]Aggressive IOC vs two orders: second order's price is more favorable than first",
-            start_timestamp=report_start_timestamp,
             event_id=report_id,
             parent_id=parent))
 
@@ -56,7 +50,7 @@ def scenario(factory, parent=None):
             f"Case[TC_{scenario_id}.{case_id}]: "
             f"Trader {trader1} vs trader {trader2} for instrument {instrument['SecurityID']}",
             report_id, {
-                'case_id': sf.create_event_id(),
+                'case_id': sf.create_event_id(factory),
                 'Instrument': instrument['SecurityID'],
                 'Order1Price': instrument['Price'],
                 'Order1Qty': 30,

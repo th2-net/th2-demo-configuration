@@ -5,21 +5,23 @@ import logging
 import random
 import uuid
 import time
+from pathlib import Path
 from th2_grpc_act_template.act_template_pb2 import PlaceMessageRequest
 from google.protobuf.timestamp_pb2 import Timestamp
 from th2_common.schema.factory.common_factory import CommonFactory
 from th2_grpc_act_template.act_service import ActService
 from th2_grpc_check1 import check1_pb2
 from th2_grpc_check1.check1_service import Check1Service
-from th2_grpc_common.common_pb2 import ValueFilter, FilterOperation, MessageMetadata, MessageFilter, ConnectionID, \
-    EventID, ListValue, Value, Message, ListValueFilter, MessageID, Event, EventBatch
+from th2_grpc_common.common_pb2 import (ValueFilter, FilterOperation, MessageMetadata, MessageFilter, RootMessageFilter,
+                                        ConnectionID, EventID, ListValue, Value, Message,
+                                        ListValueFilter, MessageID, Event, EventBatch)
 
 
 # -----------Connection functions
 def connect(config_path, tries=3):
     try:
         logging.info('Trying to connect...')
-        factory = CommonFactory(config_path=config_path, logging_config_filepath="configs/log4py.conf")
+        factory = CommonFactory(config_path=config_path, logging_config_filepath=Path("configs/log4py.conf"))
         grpc_router = factory.grpc_router
         act = grpc_router.get_service(ActService)
         check = grpc_router.get_service(Check1Service)
@@ -40,6 +42,7 @@ def connect(config_path, tries=3):
         else:
             raise
 
+
 # -------estore functions
 def submit_event(estore, event_batch):
     logging.debug(f'Event content:{str(event_batch)}')
@@ -51,30 +54,31 @@ def to_msg_body(string):
     return bytes('[{"type":"message","data":"' + string + '" } ]', 'utf-8')
 
 
-def create_event_id():
-    return EventID(id=str(uuid.uuid1()))
+def create_event_id(factory):
+    start_timestamp = Timestamp()
+    start_timestamp.GetCurrentTime()
+    book_name = factory['factory'].box_configuration.book_name
+    scope = factory['factory'].box_configuration.box_name
+    return EventID(id=str(uuid.uuid1()), book_name=book_name, scope=scope, start_timestamp=start_timestamp)
 
 
-def store_event(factory, name, event_id=None, parent_id=None, body=b"", status='SUCCESS', etype=b""):
+def store_event(factory, name, event_id=None, parent_id=None, body=b"", status='SUCCESS', etype=''):
     new_event_id = event_id
     if new_event_id is None:
-        new_event_id = create_event_id()
-    case_start_timestamp = Timestamp()
-    case_start_timestamp.GetCurrentTime()
+        new_event_id = create_event_id(factory)
     submit_event(
         estore=factory['estore'],
         event_batch=create_event_batch(
             report_name=name,
             etype=etype,
             status=status,
-            start_timestamp=case_start_timestamp,
             event_id=new_event_id,
             parent_id=parent_id,
             body=body))
     return new_event_id
 
 
-def create_event_batch(report_name, start_timestamp, event_id, parent_id=None, status='SUCCESS', body=b"", etype=b""):
+def create_event_batch(report_name, event_id, parent_id=None, status='SUCCESS', body=b"", etype=''):
     current_timestamp = Timestamp()
     current_timestamp.GetCurrentTime()
     logging.info(f'Storing event {report_name}...')
@@ -84,7 +88,6 @@ def create_event_batch(report_name, start_timestamp, event_id, parent_id=None, s
         status=status,
         body=body,
         type=etype,
-        start_timestamp=start_timestamp,
         end_timestamp=current_timestamp,
         parent_id=parent_id)
     event_batch = EventBatch()
@@ -102,7 +105,7 @@ def placeOrderFIX(act, place_message_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        #raise SystemExit
+        # raise SystemExit
     if act_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -119,7 +122,7 @@ def sendMessage(act, place_message_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        #raise SystemExit
+        # raise SystemExit
     if act_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -132,18 +135,27 @@ def get_field_value_from_act_response(response, field):
     return response.response_message.fields[field].simple_value
 
 
-def create_message_object(msg_type, fields, session_alias=''):
+def create_message_object(factory, msg_type, fields, session_alias):
     fields = copy.deepcopy(fields)
     for field in fields:
         if field == 'TradingParty' and isinstance(fields[field], list):
             fields[field] = wrap_into_trading_party("value", fields[field]),
         if isinstance(fields[field], str) or isinstance(fields[field], int) or isinstance(fields[field], float):
             fields[field] = Value(simple_value=str(fields[field]))
+    book_name = factory['factory'].box_configuration.book_name
+    msg_timestamp = Timestamp()
+    msg_timestamp.GetCurrentTime()
+
     return Message(
         metadata=MessageMetadata(
             message_type=msg_type,
             id=MessageID(
-                connection_id=ConnectionID(session_alias=session_alias))),
+                connection_id=ConnectionID(session_alias=session_alias),
+                timestamp=msg_timestamp,
+                book_name=book_name,
+                direction='SECOND',
+                sequence=1
+            )),
         fields=fields)
 
 
@@ -156,7 +168,7 @@ def submitCheckSequenceRule(check, check_sequence_rule_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        #raise SystemExit
+        # raise SystemExit
     if check_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -173,7 +185,7 @@ def submitCheckRule(check, check_rule_request):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        #raise SystemExit
+        # raise SystemExit
     if check_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
@@ -189,13 +201,14 @@ def createCheckpoint(check, parent_id):
     except Exception as e:
         logging.error('FATAL ERROR. Unable to proceed.')
         logging.error(str(e))
-        #raise SystemExit
+        # raise SystemExit
     if check_response.status.status == 0:
         logging.info('Request submitted. Response received.')
     else:
         logging.error(f'Request submitted. Check executed incorrectly{str(check_response.status)}.')
 
     return check_response
+
 
 def create_filter_object(msg_type, fields, key_fields_list):
     fields = copy.deepcopy(fields)
@@ -216,7 +229,7 @@ def create_filter_object(msg_type, fields, key_fields_list):
             for rgroup in fields[field]:
                 flist.append(wrap_filter(rgroup))
             fields[field] = ValueFilter(list_filter=(ListValueFilter(values=flist)))
-    return MessageFilter(messageType=msg_type, fields=fields)
+    return RootMessageFilter(messageType=msg_type, message_filter=MessageFilter(fields=fields))
 
 
 def wrap_filter(fields):
@@ -312,7 +325,7 @@ def wrap_into_target_party(value_type, repeating_groups):
         return repeating_groups
     else:
         print("Incorrect value type for TradingParty. Only filter or value available")
-        #raise SystemExit
+        # raise SystemExit
 
 
 def wrap_into_trading_party(value_type, repeating_groups):
@@ -348,7 +361,7 @@ def wrap_into_trading_party(value_type, repeating_groups):
         return repeating_groups
     else:
         print("Incorrect value type for TradingParty. Only filter or value available")
-        #raise SystemExit
+        # raise SystemExit
 
 
 def to_msg_body(string):
@@ -390,11 +403,11 @@ def wrap_into_no_related_sym(value_type, repeating_groups):
         return repeating_groups
     else:
         print("Incorrect value type for NoRelatedSym. Only filter or value available")
-        #raise SystemExit
+        # raise SystemExit
 
 
 def request_security_status(instrument, session_alias, event_id, factory):
-    # SecurityStatusRequest parametes
+    # SecurityStatusRequest parameters
     sec_status_request = {
         'SecurityID': instrument,
         'SecurityIDSource': '8',
@@ -405,8 +418,8 @@ def request_security_status(instrument, session_alias, event_id, factory):
         act=factory['act'],
         place_message_request=PlaceMessageRequest(
             description=f'Request SecurityStatus for {instrument}',
-            connection_id=ConnectionID(session_alias=session_alias),
             parent_event_id=event_id,
-            message=create_message_object(msg_type='SecurityStatusRequest',
-                                             fields=sec_status_request,
-                                             session_alias=session_alias)))
+            message=create_message_object(factory=factory,
+                                          msg_type='SecurityStatusRequest',
+                                          fields=sec_status_request,
+                                          session_alias=session_alias)))
